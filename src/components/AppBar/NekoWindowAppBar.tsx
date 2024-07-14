@@ -106,7 +106,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
         const scrollHandler = () => {
             if (window.scrollY !== 0) {
                 setAtTop(false);
-            }else{
+            } else {
                 setAtTop(true);
             }
         };
@@ -129,17 +129,19 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
             <AppBar position='fixed' sx={[{ minWidth: '1360px', bgcolor: '#ffffff', color: '#000000', zIndex: "2000" }, transparent === true && atTop && { bgcolor: "rgba(0,0,0,0)", color: '#ffffff', boxShadow: "unset" }]}>
                 <Toolbar>
                     {/* 网站标题 */}
-                    <Typography variant='h6' noWrap component='div' onClick={() => { document.location = '/' }} sx={{ cursor: 'pointer' }}>{'墨云视窗'} </Typography>
+                    <Typography variant='h6' noWrap component='div' onClick={() => { document.location = '/' }} sx={{ cursor: 'pointer', width: '40%' }}>{'墨云视窗'} </Typography>
                     {/* 搜索框 */}
-                    <Box sx={{width: '20%', marginLeft: 'auto', marginRight: 'auto', display: 'flex', border: '1px solid', borderColor: theme.palette.text.disabled, borderRadius: '12px', justifyContent: 'center', padding: '2px 2px',bgcolor:"#f5f5f5" }}>
-                        <InputBase sx={{width: '100%', padding: "6px 12px", ".MuiInputBase-input":{padding: "0px 0px"}}} size='small' placeholder='搜索你的视频' />
-                        <SearchIcon sx={{color: '#000000'}}/>
+                    <Box sx={{ width: '20%', marginLeft: 'auto', padding: "2px 12px", marginRight: 'auto', display: 'flex', border: '1px solid', borderColor: theme.palette.text.disabled, borderRadius: '12px', justifyContent: 'center', bgcolor: "#f5f5f5" }}>
+                        <InputBase sx={{ width: '100%', padding: "6px 6px", ".MuiInputBase-input": { padding: "2px 6px", borderRadius: '2px', ":focus": { backgroundColor: "#e3e3e3" } }, }} size='small' placeholder='搜索你的视频' />
+                        <IconButton sx={{ margin: "auto 2px", padding: "2px 2px" }}>
+                            <SearchIcon sx={{ color: '#000000' }} />
+                        </IconButton>
                     </Box>
                     {/* 右侧菜单 */}
-                    <Box sx={{ display: 'flex', flexDirection: 'row' }} >
+                    <Box sx={{ display: 'flex', flexDirection: 'row', width: '40%' }} >
                         {/* 登录与用户信息*/}
                         {
-                            userInfo === undefined && <Button sx={{ margin: 'auto', color: 'inherit' }} variant='text' onClick={() => setLoginDialogOpen(true)}>
+                            userInfo === undefined && <Button sx={{ margin: 'auto 0px auto auto', color: 'inherit' }} variant='text' onClick={() => setLoginDialogOpen(true)}>
                                 登录
                             </Button>
                         }
