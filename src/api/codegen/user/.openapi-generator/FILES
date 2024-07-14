@@ -1,0 +1,14 @@
+.openapi-generator-ignore
+apis/UserControllerApi.ts
+apis/index.ts
+index.ts
+models/DailyBonusVO.ts
+models/EmailLoginDTO.ts
+models/ResponseDailyBonusVO.ts
+models/ResponseObject.ts
+models/ResponseUserDetailVO.ts
+models/SendLoginEmailCodeDTO.ts
+models/UpdateUserDetailDTO.ts
+models/UserDetailVO.ts
+models/index.ts
+runtime.ts
