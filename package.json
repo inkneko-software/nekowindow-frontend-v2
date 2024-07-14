@@ -6,12 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api-user": "openapi-generator-cli generate -i http://localhost/swagger/user/api-docs -o src/api/codegen/user -g typescript-fetch --skip-validate-spec"
   },
   "dependencies": {
+    "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.16.0",
     "@mui/material": "^5.15.20",
+    "@mui/material-nextjs": "^5.15.11",
+    "@openapitools/openapi-generator-cli": "^2.13.4",
+    "dashjs": "^4.7.4",
     "next": "14.2.4",
     "react": "^18",
     "react-dom": "^18"
