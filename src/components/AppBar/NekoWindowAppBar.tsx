@@ -31,6 +31,7 @@ import { Popper, Paper, Fade, Stack } from '@mui/material';
 // import LoginDialog from '@components/Auth/LoginDialog';
 import theme from '@theme/theme';
 import { UserDetailVO } from '@api/codegen/user';
+import LoginDialog from '@components/LoginDialog/LoginDialog';
 
 // const userapi = new UserControllerApi(new Configuration({ credentials: 'include' }))
 
@@ -241,7 +242,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                     </Box>
                 </Toolbar>
             </AppBar>
-            {/* <LoginDialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} /> */}
+            <LoginDialog open={loginDialogOpen} onClose={() => setLoginDialogOpen(false)} />
         </Box>
 
     )
