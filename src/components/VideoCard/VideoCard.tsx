@@ -50,49 +50,53 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, width, height }) => {
         height: height || 'auto'
       }}>
       {/* 封面部分 */}
-      <Box component='a' href="/video/1" target='_blank' sx={{ position: 'relative', borderRadius: 1, overflow: 'hidden', width: '100%', ":hover": { cursor: 'pointer', ".video-card-video-stat": { color: "#98c3e6" } } }}>
-        {/* 封面 */}
-        <img src={cover_img} alt={title} style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '16 / 9' }} />
-        {/* 视频数据 */}
-        <Box
+      <Box component='a' href="/video/1" target='_blank' sx={{ display: 'flex', flexDirection: 'column', ":hover": { cursor: 'pointer', ".video-card-title": { color: "#6faee0" } } }}>
+        {/* 封面与视频数据*/}
+        <Box sx={{ position: 'relative', borderRadius: 1, overflow: 'hidden', width: '100%', }}>
+          <img src={cover_img} alt={title} style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '16 / 9' }} />
+          {/* 视频数据 */}
+          <Box
+            sx={{
+              display: 'flex',
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              background: 'linear-gradient( rgba(0,0,0,0), rgba(0,0,0,0.6))',
+              color: 'white',
+              padding: '4px 6px',
+              paddingTop: '18px',
+              boxSizing: 'border-box',
+              borderRadius: '4px'
+            }}
+          >
+            <SlideshowOutlinedIcon sx={{ fontSize: 16 }} />
+            <Typography sx={{ margin: '0 6px 0 2px' }} variant='caption'>{watched}</Typography>
+            <ArticleOutlinedIcon sx={{ fontSize: 16 }} />
+            <Typography sx={{ margin: '0 6px 0 2px' }} variant='caption'>{danmaku_nums}</Typography>
+            <Typography sx={{ marginLeft: 'auto', marginRight: 0 }} variant='caption'>{formatDuration(duration)}</Typography>
+          </Box>
+        </Box>
+        {/* 视频标题 */}
+        <Typography
+          className='video-card-title'
           sx={{
-            display: 'flex',
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            width: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            color: 'white',
-            padding: '4px 6px',
-            boxSizing: 'border-box',
-            borderRadius: '4px'
+            padding: '2px 0px',
+            marginTop: '6px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            '-webkit-box-orient': 'vertical',
+            '-webkit-line-clamp': '2',
+            fontSize: '0.95em',
+            lineHeight: '1.5em',
+            height: '3em',
+            ":hover": { cursor: 'pointer' }
           }}
         >
-          <SlideshowOutlinedIcon className="video-card-video-stat" sx={{ fontSize: 16 }} />
-          <Typography className="video-card-video-stat" sx={{ margin: '0 6px 0 2px' }} variant='caption'>{watched}</Typography>
-          <ArticleOutlinedIcon className="video-card-video-stat" sx={{ fontSize: 16 }} />
-          <Typography className="video-card-video-stat" sx={{ margin: '0 6px 0 2px' }} variant='caption'>{danmaku_nums}</Typography>
-          <Typography className="video-card-video-stat" sx={{ marginLeft: 'auto', marginRight: 0 }} variant='caption'>{formatDuration(duration)}</Typography>
-        </Box>
+          {title}
+        </Typography>
       </Box>
-      {/* 视频标题 */}
-      <Typography
-        sx={{
-          padding: '2px 0px',
-          marginTop: '6px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          '-webkit-box-orient': 'vertical',
-          '-webkit-line-clamp': '2',
-          fontSize: '0.95em',
-          lineHeight: '1.5em',
-          height: '3em',
-          ":hover": { cursor: 'pointer', color: "#6faee0"}
-        }}
-      >
-        {title}
-      </Typography>
       {/* 视频上传者与时间信息 */}
       <Box sx={{ color: 'rgb(129, 129, 129)', display: 'flex', ":hover": { cursor: 'pointer', color: "#6faee0" } }}>
         <Typography variant='subtitle2'>{`${uploader} · ${formatDistance(video.date, new Date(), { locale: zhCN, addSuffix: true })}`}</Typography>
