@@ -182,7 +182,9 @@ const ProgressBar = (props: ProgressBarProps) => {
           cursor: 'pointer',
           position: 'relative',
           left: '0',
-          userSelect: 'none'
+          userSelect: 'none',
+          margin: '0px 0px',
+          transition: 'margin 0.1s ease-in-out'
         },
         !props.brief && {
           margin: "0px 10px"
