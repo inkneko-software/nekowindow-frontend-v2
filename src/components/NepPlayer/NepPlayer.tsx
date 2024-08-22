@@ -65,7 +65,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   // }, [props.duration, props.currentTime])
 
   React.useEffect(() => {
-    var video = document.getElementById("nekowindow-nepplayer") as HTMLVideoElement;
+    var video = document.getElementById("nep-player-video") as HTMLVideoElement;
     console.log(video)
     if (video === null) {
       return;
@@ -116,12 +116,16 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
 
     video.src = src;
 
-    var player = document.getElementById("nepplayer-wrap") as HTMLDivElement;
+    var player = document.getElementById("nep-player-wrap") as HTMLDivElement;
 
     var inactiveHandle: NodeJS.Timeout | number | undefined = undefined;
 
-    player.onmouseenter = (event) => {
-      console.log(1)
+    inactiveHandle = setTimeout(() => {
+      setIsBriefMode(true);
+      inactiveHandle = undefined;
+    }, 1000);
+
+    player.onmousemove = (event) => {
       setIsBriefMode(false);
       if (inactiveHandle !== undefined) {
         clearTimeout(inactiveHandle);
@@ -129,12 +133,24 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       inactiveHandle = setTimeout(() => {
         setIsBriefMode(true);
         inactiveHandle = undefined;
-      }, 3000);
+      }, 2000);
     }
 
     player.onmouseleave = (event) => {
       setIsBriefMode(true);
+      if (inactiveHandle !== undefined) {
+        clearTimeout(inactiveHandle);
+      }
     }
+
+    var controllButtons = document.getElementById('nep-player-controll-btns') as HTMLDivElement;
+    controllButtons.onmousemove = (event) =>{
+      event.stopPropagation();
+      if (inactiveHandle !== undefined) {
+        clearTimeout(inactiveHandle);
+      }
+    }
+
 
     return () => {
       video.onclick = null;
@@ -146,8 +162,9 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       video.onpause = null;
       document.onfullscreenchange = null;
 
-      player.onmouseenter = null;
+      player.onmousemove = null;
       player.onmouseleave = null;
+      controllButtons.onmousemove = null;
     }
 
   }, [])
@@ -185,14 +202,14 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
 
   const handleProgressSeek = (newTime: number) => {
     setCurrentTime(newTime);
-    var video = document.getElementById("nekowindow-nepplayer") as HTMLVideoElement;
+    var video = document.getElementById("nep-player-video") as HTMLVideoElement;
     video.currentTime = newTime;
   }
 
   return (
-    <Box id='nepplayer-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'white' }} >
+    <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'white', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
       {/* video标签 */}
-      <Box component='video' id="nepplayer-video" sx={{ width: '100%' }} />
+      <Box component='video' id="nep-player-video" sx={{ width: '100%' }} />
       {/* 视频标题 */}
       <Box sx={{
         display: 'none',
@@ -210,13 +227,12 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
         bottom: 0,
         left: 0,
         width: '100%',
-        background: 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6))',
-
+        background: `${isBriefMode ? 'unset' : 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6))'}`,
       }}>
         {/* 进度条 */}
         <ProgressBar style={{ marginTop: '32px' }} brief={isBriefMode} currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
         {/* 控制按钮 */}
-        <Box sx={{ display: `${isBriefMode ? 'none' : 'flex'}` }}>
+        <Box id='nep-player-controll-btns' sx={{ display: 'flex', height: `${isBriefMode ? '0px' : '48px'}`, overflow: 'hidden', transition: 'height 0.1s ease-in-out' }}>
           {/* 暂停与播放 */}
           <IconButton sx={{ color: "#ffffff" }} size="large" >
             {paused ? <PlayArrowRoundedIcon /> : <PauseRoundedIcon />}
