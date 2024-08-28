@@ -91,7 +91,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
     //video事件监听
     video.ondurationchange = (event) => {
       setDuration(video.duration)
-      console.log("Not sure why, but the duration of the video has changed.", video.duration);
     }
 
     video.ontimeupdate = () => {
@@ -144,7 +143,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
     }
 
     var controllButtons = document.getElementById('nep-player-controll-btns') as HTMLDivElement;
-    controllButtons.onmousemove = (event) =>{
+    controllButtons.onmousemove = (event) => {
       event.stopPropagation();
       if (inactiveHandle !== undefined) {
         clearTimeout(inactiveHandle);
@@ -207,7 +206,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   }
 
   return (
-    <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'white', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
+    <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
       {/* video标签 */}
       <Box component='video' id="nep-player-video" sx={{ width: '100%' }} />
       {/* 视频标题 */}
@@ -228,11 +227,13 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
         left: 0,
         width: '100%',
         background: `${isBriefMode ? 'unset' : 'linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.6))'}`,
+        opacity: `${isBriefMode ? '0' : '1'}`,
+        transition: 'opacity 0.1s ease-in-out'
       }}>
         {/* 进度条 */}
-        <ProgressBar style={{ marginTop: '32px' }} brief={isBriefMode} currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
+        <ProgressBar style={{ marginTop: '32px' }} currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
         {/* 控制按钮 */}
-        <Box id='nep-player-controll-btns' sx={{ display: 'flex', height: `${isBriefMode ? '0px' : '48px'}`, overflow: 'hidden', transition: 'height 0.1s ease-in-out' }}>
+        <Box id='nep-player-controll-btns' sx={{ display: 'flex', overflow: 'hidden' }}>
           {/* 暂停与播放 */}
           <IconButton sx={{ color: "#ffffff" }} size="large" >
             {paused ? <PlayArrowRoundedIcon /> : <PauseRoundedIcon />}
@@ -265,6 +266,10 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
           {/* 全屏按钮 */}
           <IconButton sx={{ color: "#ffffff" }} size="large" onClick={windowFullscreenClicked}><FullscreenRoundedIcon /></IconButton>
         </Box>
+      </Box>
+      {/* 简略进度条 */}
+      <Box sx={{ position: 'absolute', bottom: 0, width: '100%', visibility: `${isBriefMode ? 'unset' : 'hidden'}`, transition: 'visibility 0.1s ease-in' }}>
+        <ProgressBar style={{ marginTop: '32px' }} brief currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
       </Box>
       {/* 右下角暂停图标 */}
     </Box>
