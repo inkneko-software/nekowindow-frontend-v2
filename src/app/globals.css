@@ -2,3 +2,8 @@ html, body{
     margin: 0px 0px;
     height: 100%;
 }
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
