@@ -30,10 +30,10 @@ import { Popper, Paper, Fade, Stack } from '@mui/material';
 
 // import LoginDialog from '@components/Auth/LoginDialog';
 import theme from '@theme/theme';
-import { UserDetailVO } from '@api/codegen/user';
+import { Configuration, UserControllerApi, UserDetailVO } from '@api/codegen/user';
 import LoginDialog from '@components/LoginDialog/LoginDialog';
 
-// const userapi = new UserControllerApi(new Configuration({ credentials: 'include' }))
+const userapi = new UserControllerApi(new Configuration({ credentials: 'include' }))
 
 interface INavigationButton {
     text: string,
@@ -94,7 +94,7 @@ interface INekoWindowAppBar {
 const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
     const theme = useTheme();
     const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-    const [userInfo, setUserInfo] = useState<UserDetailVO>();
+    const [userInfo, setUserInfo] = useState<UserDetailVO | null>();
     const [messagePopperOpen, setMessagePopperOpen] = useState(false);
     const [activityPopperOpen, setActivityPopperOpen] = useState(false)
     const [collectionPopperOpen, setCollectionPopperOpen] = useState(false)
@@ -112,16 +112,20 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
             }
         };
         document.addEventListener('scroll', scrollHandler)
+
+        userapi.myUserDetail()
+            .then(res => {
+                if (res.code !== 0) {
+                    setUserInfo(null);
+                    return;
+                }
+                setUserInfo(res.data)
+            })
+            .catch()
+
         return () => {
             document.removeEventListener('scroll', scrollHandler)
         }
-        //     console.log('load 1')
-        //     userapi.myUserDetail()
-        //         .then(res => res.data)
-        //         .then(userInfoResponse => {
-        //             setUserInfo(userInfoResponse)
-        //         })
-        //         .catch()
 
     }, [])
 
@@ -139,15 +143,15 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                         </IconButton>
                     </Box>
                     {/* 右侧菜单 */}
-                    <Box sx={{ display: 'flex', flexDirection: 'row', width: '40%' }} >
+                    <Box sx={{ display: 'flex', flexDirection: 'row', width: '40%', justifyContent: 'right' }} >
                         {/* 登录与用户信息*/}
                         {
-                            userInfo === undefined && <Button sx={{ margin: 'auto 0px auto auto', color: 'inherit' }} variant='text' onClick={() => setLoginDialogOpen(true)}>
+                            userInfo === null && <Button sx={{ margin: 'auto 0px auto auto', color: 'inherit' }} variant='text' onClick={() => setLoginDialogOpen(true)}>
                                 登录
                             </Button>
                         }
                         {
-                            userInfo !== undefined && <NavigationButton text='' icon={<Avatar src={userInfo?.avatarUrl} />}>
+                            userInfo !== undefined && userInfo !== null && <NavigationButton text='' icon={<Avatar src={userInfo?.avatarUrl} />}>
                                 <Paper sx={{ padding: 3, display: 'flex', flexDirection: 'column' }}>
                                     <Avatar sx={{ margin: '12px auto' }} src={userInfo?.avatarUrl} />
                                     <Typography sx={{ margin: '6px auto' }} variant='body2' >{userInfo?.username}</Typography>
