@@ -127,7 +127,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
 
     return (
         <Box sx={{ width: '100%', minWidth: '1360px', }}>
-            <AppBar position='fixed' sx={[{ minWidth: '1360px', bgcolor: '#ffffff', color: '#000000', zIndex: "2000" }, transparent === true && atTop && { bgcolor: "rgba(0,0,0,0)", color: '#ffffff', boxShadow: "unset" }]}>
+            <AppBar position='fixed' sx={[{ minWidth: '1360px', bgcolor: '#ffffff', color: '#000000' }, transparent === true && atTop && { bgcolor: "rgba(0,0,0,0)", color: '#ffffff', boxShadow: "unset" }]}>
                 <Toolbar>
                     {/* 网站标题 */}
                     <Typography variant='h6' noWrap component='div' onClick={() => { document.location = '/' }} sx={{ cursor: 'pointer', width: '40%' }}>{'墨云视窗'} </Typography>
