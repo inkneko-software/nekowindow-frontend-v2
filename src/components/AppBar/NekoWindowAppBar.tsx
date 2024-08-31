@@ -242,7 +242,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                                 </Stack>
                             </Paper>
                         </NavigationButton>
-                        <Button onClick={() => userInfo === null ? setLoginDialogOpen(true) : window.open('/posts/upload', '_blank')} variant='contained' startIcon={<FileUploadOutlinedIcon />} sx={{ height: 30, margin: 'auto 5px' }} >投稿</Button>
+                        <Button onClick={() => userInfo === null ? setLoginDialogOpen(true) : window.open('/posts/myposts', '_blank')} variant='contained' startIcon={<FileUploadOutlinedIcon />} sx={{ height: 30, margin: 'auto 5px' }} >投稿</Button>
                     </Box>
                 </Toolbar>
             </AppBar>
