@@ -6,6 +6,11 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import theme from '@theme/theme';
+import { Configuration, UserControllerApi } from '@api/codegen/user';
+import useToast from '@components/Common/Toast';
+
+const userControllerApi = new UserControllerApi(new Configuration({credentials: 'include'}));
+
 interface LoginDialogProps {
   open: boolean,
   onClose: () => void
@@ -19,18 +24,36 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose }) => {
   const [emailCode, setEmailCode] = React.useState('');
   const [coolDownSeconds, setCoolDownSeconds] = React.useState(0)
 
+  const [Toast, makeToast] = useToast();
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   }
+
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
   }
+
   const handlePasswordLogin = () => {
 
   }
+
   var coolDownHandle: NodeJS.Timeout | null = null;
   const handleSendEmailCode = () => {
     if (coolDownHandle === null) {
+      if (email === '') {
+        makeToast("邮箱不能为空", 'error')
+        return;
+      }
+
+      userControllerApi.sendLoginEmailCode({ sendLoginEmailCodeDTO: { email: email } }).then(r => {
+        if (r.code !== 0) {
+          makeToast(r.message, 'error');
+        } else {
+          makeToast(r.message)
+        }
+      });
+
       setCoolDownSeconds(60);
       var coolDownSecondsNumber = 60;
       coolDownHandle = setInterval(() => {
@@ -42,12 +65,34 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose }) => {
       }, 1000);
     }
   }
-  const handleEmailCodeLogin = () => {
 
+  const handleEmailCodeLogin = () => {
+    if (email === '') {
+      makeToast("邮箱不能为空", 'error')
+      return;
+    }
+
+    if (emailCode === '') {
+      makeToast("请输入验证码", 'error')
+      return;
+    }
+
+    userControllerApi.login({emailLoginDTO: {email: email, code: emailCode}}).then(r=>{
+      if (r.code !== 0){
+        makeToast(r.message, 'error');
+        return;
+      }
+
+      makeToast(r.message);
+      setTimeout(()=>{
+        location.reload();
+      }, 1000)
+    })
   }
 
   return (
     <Dialog open={open} onClose={onClose} sx={{ display: 'flex', flexDirection: 'column' }}>
+      {Toast}
       <IconButton sx={{ position: 'absolute', right: '16px', top: '16px' }} onClick={onClose}>
         <CloseOutlinedIcon />
       </IconButton>
