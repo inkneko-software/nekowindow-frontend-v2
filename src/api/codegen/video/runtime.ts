@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * service-user
- * 用户服务API接口说明
+ * service-video
+ * 视频服务API接口说明
  *
  * The version of the OpenAPI document: 0.0.1
  * 
@@ -13,7 +13,7 @@
  */
 
 
-export const BASE_PATH = "http://localhost:3000".replace(/\/+$/, "");
+export const BASE_PATH = "http://localhost".replace(/\/+$/, "");
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path
