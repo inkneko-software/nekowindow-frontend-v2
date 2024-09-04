@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "api-user": "openapi-generator-cli generate -i http://localhost/swagger/user/api-docs -o src/api/codegen/user -g typescript-fetch --skip-validate-spec"
+    "api-user": "openapi-generator-cli generate -i http://localhost:3000/swagger/user/api-docs -o src/api/codegen/user -g typescript-fetch --skip-validate-spec",
+    "api-video": "openapi-generator-cli generate -i http://localhost:3000/swagger/video/api-docs -o src/api/codegen/video -g typescript-fetch --skip-validate-spec"
+
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",
