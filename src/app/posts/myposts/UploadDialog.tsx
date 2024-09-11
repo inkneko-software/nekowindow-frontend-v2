@@ -22,7 +22,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import theme from '@theme/theme';
-import { Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs } from '@mui/material';
+import { Chip, Stack, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs } from '@mui/material';
 import { Configuration, PartitionInfo, VideoControllerApi } from '@api/codegen/video';
 
 const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include' }));
@@ -38,10 +38,22 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({ open, onClose }) => 
     '公开范围',
   ];
   const [currentStep, setCurrentStep] = React.useState<number>(0);
+  // 是否已选择视频文件
   const [isVideoSelected, setIsVideoSelected] = React.useState(false);
+  // 视频预览链接
   const [videoPreviewUrl, setVideoPreviewUrl] = React.useState('');
+  // 封面预览链接
+  const [coverPreviewUrl, setCoverPreviewUrl] = React.useState('');
+  // 视频上传预签名链接
   const [videoUploadUrl, setVideoUploadUrl] = React.useState('');
+  // 分区
   const [partitions, setPartitions] = React.useState<PartitionInfo[]>([]);
+  // 已选择的分区
+  const [selectedPartition, setSelectedPartition] = React.useState();
+  // 当前分区推荐的标签
+  const [recommendTags, setRecommendTags] = React.useState<string[]>([]);
+  // 已选择的标签
+  const [tags, setTags] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     videoapi.getPartitionList().then(res => {
@@ -62,18 +74,17 @@ export const UploadDialog: React.FC<UploadDialogProps> = ({ open, onClose }) => 
 
       var fileInput = document.getElementById("video-upload-input") as HTMLInputElement;
       fileInput.onchange = () => {
-        console.log(fileInput);
         var req = new XMLHttpRequest();
         req.onload = () => {
           var u = videoUploadUrl.split('?')[0];
-          console.log(u)
           setVideoPreviewUrl(u);
         }
-        req.open('PUT', videoUploadUrl);
+
         if (fileInput.files !== null && fileInput.files.length > 0) {
           setIsVideoSelected(true);
           var file = fileInput.files[0];
           if (file !== null) {
+            req.open('PUT', videoUploadUrl);
             req.send(file)
           }
         }
@@ -140,16 +151,80 @@ return new Promise<ResponseMusic>((resolve, reject) => {
 
   }
 
+  /**
+   * 重新选择文件的处理逻辑
+   */
   const handleReupload = () => {
     setIsVideoSelected(false);
     setVideoPreviewUrl('');
     setVideoUploadUrl('');
   }
 
+  /**
+   * 分区更换选择的处理逻辑
+   */
+  const handlePartitionChange = (partitionId: number) => {
+    videoapi.getPartitionRecommendTagList({ partitionId: partitionId }).then(res => {
+      if (res.data !== undefined) {
+        setRecommendTags(res.data)
+      }
+    })
+  }
+
+  /**
+   * 添加选择的标签
+   * 
+   */
+  const handleAddTag = (tagName: string) => {
+    if (tags.indexOf(tagName) === -1) {
+      setTags(prev => [...prev, tagName])
+    }
+  }
+
+  /**
+   * 移除标签
+   * @param tagName 标签名称
+   */
+  const handleDeleteTag = (tagName: string) => {
+    setTags(tags.filter(val => tagName !== val))
+  }
+
+  /**
+   * 上传封面
+   */
+  const handleUploadCover = () => {
+    var coverInput = document.getElementById('cover-upload-input') as HTMLInputElement;
+    videoapi.generateCoverUploadUrl().then(res => {
+      if (res.data !== undefined) {
+        coverInput.onchange = () => {
+          if (coverInput.files && coverInput.files.length !== 0) {
+            var coverUploadUrl = res.data as string;
+            var coverFile = coverInput.files[0];
+            var req = new XMLHttpRequest();
+            req.onload = () => {
+              var u = coverUploadUrl.split('?')[0];
+              setCoverPreviewUrl(u);
+            }
+            req.open('PUT', coverUploadUrl);
+            req.send(coverFile)
+
+          }
+        }
+        coverInput.click();
+      }
+    })
+  }
+
+  const handleCreatePost = () =>{
+
+  }
+
   return (
     <Dialog open={open} onClose={onClose} sx={{ display: 'flex', flexDirection: 'column', ".MuiPaper-root": { width: '960px', borderRadius: '18px', height: 'calc(100vh - 128px)' } }} maxWidth={false}>
       {/* 视频文件上传控件 */}
       <input type='file' hidden id='video-upload-input' />
+      {/* 封面文件的上传控件 */}
+      <input type='file' hidden id='cover-upload-input' />
       {/* 标题显示与关闭按钮 */}
       <Box sx={{ display: 'flex', padding: 1 }}>
         <Typography variant='h5' noWrap sx={{ margin: "auto auto auto 16px" }}>视频标题</Typography>
@@ -175,28 +250,87 @@ return new Promise<ResponseMusic>((resolve, reject) => {
             <Typography variant='h5' fontWeight='bold' sx={{ marginBottom: 1 }}>视频信息</Typography>
             {/* 视频标题 */}
             <TextField sx={{ width: '100%', margin: '16px 0px' }} label="视频标题（必填）" InputLabelProps={{ shrink: true }} placeholder='添加一个可以描述你视频的标题' variant='outlined' autoFocus></TextField>
-
+            {/* 视频描述 */}
             <TextField sx={{ width: '100%', margin: '16px 0px' }} label="说明" InputLabelProps={{ shrink: true }} placeholder='向观看者介绍你的视频' multiline minRows={3} variant='outlined'></TextField>
+            {/* 封面 */}
             <Typography variant='subtitle1'>封面</Typography>
             <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>设置与众不同的缩略图，吸引观看者注意。</Typography>
             <Box sx={{ display: 'flex', margin: '8px 0px' }}>
-              <Box sx={{ width: '151px', height: '82px', border: '1px black dashed', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', ':hover': { bgcolor: '#e3e3e3' } }}>
-                <AddPhotoAlternateOutlinedIcon />
-                <Typography>上传封面</Typography>
+              <Box sx={{
+                width: '151px',
+                height: '82px',
+                border: '1px black dashed',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                ':hover': { bgcolor: '#e3e3e3' }
+              }}
+                onClick={handleUploadCover}
+              >
+                {
+                  coverPreviewUrl === '' &&
+                  <>
+                    <AddPhotoAlternateOutlinedIcon />
+                    <Typography>上传封面</Typography>
+                  </>
+                }
+                {
+                  coverPreviewUrl !== '' &&
+                  <Box component='img' src={coverPreviewUrl} sx={{width: '100%', height: '100%'}}/>
+                }
               </Box>
             </Box>
+            {/* 分区 */}
             <Typography variant='subtitle1' sx={{ marginTop: '8px' }}>分区</Typography>
             <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>选择视频相对应的分区，物以类聚</Typography>
             <Select
               sx={{ width: 'fit-content', minWidth: '128px' }}
+              onChange={e => handlePartitionChange(e.target.value as number)}
+              defaultValue={0}
             >
+              <MenuItem value={0}>请选择分区</MenuItem>
               {
                 partitions.map((partition, index) => {
                   return <MenuItem value={partition.partitionId} key={index}>{partition.partitionName}</MenuItem>
                 })
               }
             </Select>
+            {/* 标签 */}
+            <Typography variant='subtitle1' sx={{ marginTop: '8px' }}>标签</Typography>
+            <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>视频内容的标签</Typography>
+            {/* 已选择标签 */}
+            <Stack direction='row' spacing={1} sx={{ marginTop: '8px' }}>
+              {
+                tags.map((tag, index) => {
+                  return <Chip label={tag} onDelete={() => handleDeleteTag(tag)} />
+                })
+              }
+            </Stack>
+            {/* 标签输入框 */}
+            <TextField
+              sx={{ marginTop: '8px' }}
+              placeholder='回车或点击按钮添加标签'
+              InputProps={{
+                endAdornment: <Button>添加</Button>,
+              }}
+            />
+            {/* 推荐标签 */}
+            {
+              recommendTags.length !== 0 &&
+              <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary, marginTop: '8px' }}>分区推荐标签：</Typography>
 
+            }
+            <Stack direction='row' spacing={1} sx={{ marginTop: '8px' }}>
+              {
+                recommendTags.map((tag, index) => {
+
+                  return <Chip label={tag} onClick={() => handleAddTag(tag)} />
+                })
+              }
+            </Stack>
+            {/* 评论控制 */}
             <Typography variant='subtitle1' sx={{ marginTop: '8px' }}>评论</Typography>
             <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>评论控制</Typography>
 
@@ -211,6 +345,7 @@ return new Promise<ResponseMusic>((resolve, reject) => {
                 <FormControlLabel value="male" control={<Radio />} label="关闭" />
               </RadioGroup>
             </FormControl>
+            {/* 视频水印 */}
             <Typography variant='subtitle1' sx={{ marginTop: '8px' }}>视频水印</Typography>
             <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>将你的用户名注明于视频</Typography>
             <FormControl>
@@ -273,7 +408,7 @@ return new Promise<ResponseMusic>((resolve, reject) => {
           <Typography variant='h5' fontWeight='bold' sx={{ marginBottom: 1 }}>公开范围</Typography>
           <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>定时发布</Typography>
           <Typography variant='subtitle2' sx={{ color: theme.palette.text.secondary }}>公开 / 私有</Typography>
-          <Button variant='contained' sx={{ margin: 'auto auto', borderRadius: 8 }}> 提交</Button>
+          <Button variant='contained' sx={{ margin: 'auto auto', borderRadius: 8 }} onClick={handleCreatePost}> 提交</Button>
 
         </Box>
       }
