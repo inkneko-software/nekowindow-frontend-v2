@@ -184,7 +184,10 @@ const ProgressBar = (props: ProgressBarProps) => {
           left: '0',
           userSelect: 'none',
           margin: '0px 0px',
-          transition: 'margin 0.1s ease-in-out'
+          transition: 'margin 0.1s ease-in-out',
+          ':hover .progress-bar-tumb': {
+            display: 'unset',
+          }
         },
         !props.brief && {
           margin: "0px 10px"
@@ -212,21 +215,25 @@ const ProgressBar = (props: ProgressBarProps) => {
       {/* 浮标 */}
       <Box
         component="div"
+        className="progress-bar-tumb"
         sx={[{
-          height: "20px",
-          width: "20px",
+          height: "8px",
+          width: "8px",
+          borderRadius: '16px',
           zIndex: "10000",
           position: "absolute",
-          background: "url(/cat.svg)",
+          bottom: "-3px",
+          background: "#e3e3e3",//"url(/cat.svg)",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           transition: `left ${isSeeking ? 0 : 0.2}s ease-in-out`,
-          userSelect: 'none'
-
+          userSelect: 'none',
+          display: 'none',
         },
         props.brief === true && { display: "none" }
         ]}
-        style={{ left: `calc(${calculateProgressPercent() * 100}% - 10px)` }} />
+        style={{ left: `calc(${calculateProgressPercent() * 100}% - 4px)` }}
+      />
       {/* 已播放进度 */}
       <Box
         ref={sliderPlayedRef}
