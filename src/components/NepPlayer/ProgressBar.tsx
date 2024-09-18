@@ -137,7 +137,7 @@ const ProgressBar = (props: ProgressBarProps) => {
 
   const calculatePlayedTransform = (): string => {
     if (sliderPlayedRef.current === null) {
-      return ""
+      return "scaleX(0)"
     }
     return "scaleX(" + calculateProgressPercent() + ")"
     // return  "translateX(-" + (sliderPlayedRef.current.clientWidth * (1 - progress)) + "px)"
@@ -145,7 +145,7 @@ const ProgressBar = (props: ProgressBarProps) => {
 
   const calculateBufferedTransform = (): string => {
     if (sliderBufferedRef.current === null) {
-      return ""
+      return "scaleX(0)"
     }
 
     var ret = "scaleX(" + 0 + ")"
