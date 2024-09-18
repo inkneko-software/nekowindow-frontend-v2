@@ -166,7 +166,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       controllButtons.onmousemove = null;
     }
 
-  }, [])
+  }, [src])
 
   const videoClick = () => {
   }
