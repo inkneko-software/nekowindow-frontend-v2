@@ -7,6 +7,7 @@ import { zhCN } from "date-fns/locale";
 
 interface VideoCardProps {
   video: {
+    nkid: number,
     //封面图片链接
     cover_img: string,
     //标题
@@ -50,7 +51,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, width, height }) => {
         height: height || 'auto'
       }}>
       {/* 封面部分 */}
-      <Box component='a' href="/video/1" target='_blank' sx={{ display: 'flex', flexDirection: 'column', ":hover": { cursor: 'pointer', ".video-card-title": { color: "#6faee0" } } }}>
+      <Box component='a' href={`/video/${video.nkid}`} target='_blank' sx={{ display: 'flex', flexDirection: 'column', ":hover": { cursor: 'pointer', ".video-card-title": { color: "#6faee0" } } }}>
         {/* 封面与视频数据*/}
         <Box sx={{ position: 'relative', borderRadius: 1, overflow: 'hidden', width: '100%', }}>
           <img src={cover_img} alt={title} style={{ display: 'block', width: '100%', height: 'auto', aspectRatio: '16 / 9' }} />
