@@ -12,6 +12,7 @@ import AdaptionSwitchPanel from "./AdaptionSwitchPanel"
 import SpeedRateSwitchPanel from "./SpeedRateSwitchPanel"
 import VolumePanel from "./VolumePanel"
 import ProgressBar from "./ProgressBar"
+import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
 
 interface NepPlayerProps {
   src: string
@@ -37,7 +38,9 @@ const sxCommonButton = {
   }
 }
 
-
+export interface CustomDanmakuEvent {
+  content: string
+}
 
 const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   //视频标题
@@ -54,6 +57,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   const [volumePanelOpen, setVolumePanelOpen] = React.useState(false)
 
   const videoRef = React.useRef<HTMLVideoElement>();
+  const [danmakuEngine, setDanmakuEngine] = React.useState<NekoDanmakuEngine>();
+
   // React.useEffect(() => {
   //     let spentMinutes = Math.floor(props.currentTime / 60).toString().padStart(2, '0')
   //     let spentSeconds = Math.floor(props.currentTime % 60).toString().padStart(2, '0')
@@ -70,6 +75,10 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
     if (video === null) {
       return;
     }
+
+    var danmakuWrap = document.getElementById("nep-player-danmaku") as HTMLElement;
+    var danmakuEngine = new NekoDanmakuEngine(danmakuWrap);
+    setDanmakuEngine(danmakuEngine)
 
     video.onclick = () => {
       if (video.paused) {
@@ -94,17 +103,21 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
     }
 
     video.ontimeupdate = () => {
+      console.log(video.currentTime)
       setCurrentTime(video.currentTime)
       setBufferedTimeRanges(video.buffered)
       setDuration(video.duration)
+      danmakuEngine.onprogress(video.currentTime)
     }
 
     video.onpause = () => {
       setPaused(true)
+      danmakuEngine.onpause();
     }
 
     video.onplay = () => {
       setPaused(false)
+      danmakuEngine.onplay()
     }
 
     document.onfullscreenchange = (event) => {
@@ -164,9 +177,37 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       player.onmousemove = null;
       player.onmouseleave = null;
       controllButtons.onmousemove = null;
+      danmakuEngine.destory();
     }
 
   }, [src])
+
+  React.useEffect(() => {
+    if (danmakuEngine === undefined) {
+      return;
+    }
+
+    const handleInsertDanmaku = (data: Event) => {
+      var e = data as CustomEvent<CustomDanmakuEvent>
+      danmakuEngine.insertDanmaku({
+        //弹幕id
+        danmaku_id: 0,
+        //内容
+        content: e.detail.content,
+        //出现时间（秒）
+        progress: currentTime,
+        // 颜色
+        color: 0xffffff,
+        // 是否已发送
+        fired: false
+      });
+    }
+
+    document.addEventListener("danmaku::insert", handleInsertDanmaku)
+    return () => {
+      document.removeEventListener("danmaku::insert", handleInsertDanmaku)
+    }
+  }, [danmakuEngine, currentTime])
 
   const videoClick = () => {
   }
@@ -203,12 +244,20 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
     setCurrentTime(newTime);
     var video = document.getElementById("nep-player-video") as HTMLVideoElement;
     video.currentTime = newTime;
+    if (danmakuEngine !== undefined) {
+      danmakuEngine.onseek(newTime)
+    }
   }
 
   return (
     <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
       {/* video标签 */}
-      <Box component='video' id="nep-player-video" sx={{ width: '100%' }} />
+      <Box component='video' id="nep-player-video" sx={{ width: '100%' }} ref={videoRef} />
+      <Box id="nep-player-danmaku" sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} onClick={() => {
+        if (videoRef.current !== undefined) {
+          videoRef.current.click();
+        }
+      }} />
       {/* 视频标题 */}
       <Box sx={{
         display: 'none',
