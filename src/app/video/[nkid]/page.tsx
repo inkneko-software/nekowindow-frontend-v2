@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Avatar, Box, Chip, Container, Divider, IconButton, Paper, Stack, styled, Toolbar, Typography, useTheme, Slider, Popper, Fade, SvgIcon, Button, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, ListItemButton, RadioGroup, Radio, FormControlLabel, InputBase, Switch } from "@mui/material";
+import { Avatar, Box, Chip, Container, Divider, IconButton, Paper, Stack, styled, Toolbar, Typography, useTheme, Slider, Popper, Fade, SvgIcon, Button, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, ListItemButton, RadioGroup, Radio, FormControlLabel, InputBase, Switch, TextField } from "@mui/material";
 import NekoWindowAppBar from "@components/AppBar/NekoWindowAppBar";
 import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
@@ -19,7 +19,10 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import Head from 'next/head';
 import DefaultErrorPage from 'next/error'
 import { useRouter } from 'next/navigation';
-import NepPlayer from '@components/NepPlayer/NepPlayer';
+import NepPlayer, { CustomDanmakuEvent } from '@components/NepPlayer/NepPlayer';
+import { VideoControllerApi } from '@api/codegen/video';
+
+const videoapi = new VideoControllerApi();
 
 const SocialSection = styled('div')(({ theme }) => ({
   marginTop: "5px",
@@ -28,7 +31,7 @@ const SocialSection = styled('div')(({ theme }) => ({
   // backgroundColor: "purple"
 }));
 
-export default function VideoPage() {
+export default function VideoPage({ params }: { params: { nkid: number } }) {
   const theme = useTheme();
   const router = useRouter();
 
@@ -45,7 +48,7 @@ export default function VideoPage() {
     collection: 0,
     comment: 0,
     created_at: 0,
-    tags: [],
+    tags: ['123'],
     partition: "",
     dash_mpd_path: ''
   })
@@ -57,58 +60,40 @@ export default function VideoPage() {
     face_url: "",
   })
 
+  const [danmaku, setDanmaku] = React.useState("");
 
+  React.useEffect(() => {
+    videoapi.getVideoPostDetail({ nkid: params.nkid }).then(res => {
+      if (res.data) {
+        var shit = res.data.videos[0].dashMpdUrl as string;
+        console.log(shit)
+        setPost({ ...post, title: res.data.title as string, tags: res.data.tags as string[], dash_mpd_path: shit, description: res.data.description as string });
+      }
+    })
+  }, [])
 
-  // React.useEffect(() => {
-  //     var nkid = router.query["nkid"] as string;
-  //     if (nkid === undefined){
-  //         return ()=>{}
-  //     }
+  const handleSendDanmaku = () => {
+    var danmakuInput = document.getElementById("danmaku-input") as HTMLInputElement;
+    var danmaku = danmakuInput.value
+    if (danmaku.trim() === ''){
+      return;
+    }
+    
+    var event = new CustomEvent<CustomDanmakuEvent>("danmaku::insert", {
+      detail: {
+        content: danmaku
+      }
+    })
+    document.dispatchEvent(event);
+    danmakuInput.value = "";
+  }
 
-  //     nkid = nkid.substring(2);
+  const handleDanmakuInputKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSendDanmaku();
+    }
+  }
 
-  //     video.getVideoPost(nkid)
-  //         .then(res => res.data)
-  //         .then(res => {
-  //             if (res.code !== 0) {
-  //                 setPost({...post, nkid: 0})
-  //                 return;
-  //             }
-  //             setPost({
-  //                 nkid: nkid,
-  //                 title: res.data.title,
-  //                 description: res.data.description,
-  //                 uid: res.data.uid,
-  //                 vid: res.data.videos[0].vid,
-  //                 cid: 0,
-  //                 visit: res.data.videos[0].visit,
-  //                 danmaku: res.data.videos[0].danmakus,
-  //                 coin: 0,
-  //                 collection: 0,
-  //                 comment: 0,
-  //                 created_at: parseInt(res.data.created_at),
-  //                 tags: res.data.tags,
-  //                 partition: res.data.partition,
-  //                 dash_mpd_path: res.data.videos[0].dash_mpd_path
-  //             })
-  //         })
-  //         .catch(err => {
-  //             console.log("err", err)
-  //         });
-
-  //     if (post.nkid !== 0) {
-  //         member.GetUser(post.uid)
-  //             .then(res => res.data)
-  //             .then(res => {
-  //                 setUploader({
-  //                     uid: res.data.uid,
-  //                     nick: res.data.nick,
-  //                     sign: res.data.sign,
-  //                     face_url: res.data.face_url,
-  //                 })
-  //             })
-  //     }
-  // }, [router.query])
 
 
 
@@ -127,13 +112,13 @@ export default function VideoPage() {
     uploadColor = "#ef5350"
   }
 
-  if (post.nkid === 0) {
-    return (
-      <Box sx={{ width: "100vw", height: "100vh", display: "flex" }}>
-        <Typography sx={{ margin: "auto" }}>您所查询的稿件不存在，或已删除</Typography>
-      </Box>
-    )
-  }
+  // if (post.nkid === 0) {
+  //   return (
+  //     <Box sx={{ width: "100vw", height: "100vh", display: "flex" }}>
+  //       <Typography sx={{ margin: "auto" }}>您所查询的稿件不存在，或已删除</Typography>
+  //     </Box>
+  //   )
+  // }
 
   // const onMemberInfoUpdate = (member) => {
   //     setMemberInfo(member)
@@ -175,15 +160,16 @@ export default function VideoPage() {
             borderRadius: '4px',
             overflow: 'hidden'
           }}>
-            <NepPlayer title={'测试标题'} src="http://localhost:9000/nekowindow/upload/video/test.mp4" />
+            <NepPlayer title={'测试标题'} src={post.dash_mpd_path} />
           </Box>
+          {/* 弹幕控制面板 */}
           <Paper sx={{ display: "flex", padding: "0px 10px", borderRadius: "0", height: "40px" }} elevation={1}>
             <Typography sx={{ margin: 'auto 0' }} variant="body2">1人正在看,已装填500条弹幕</Typography>
             <FormControlLabel control={<Switch />} label="弹幕" sx={{ marginLeft: 10, fontSize: "2px" }} />
             <Paper sx={{ flexGrow: 1, display: "flex", margin: "5px", bgcolor: "#eeeeee" }}>
               <IconButton><FormatColorTextRoundedIcon /></IconButton>
-              <InputBase sx={{ flexGrow: 1, fontSize: '12px' }} placeholder="装填弹幕~" ></InputBase>
-              <Button variant="contained" startIcon={<SendRoundedIcon />}>发送</Button>
+              <InputBase id='danmaku-input' sx={{ flexGrow: 1, fontSize: '12px' }} placeholder="装填弹幕~" onKeyUp={handleDanmakuInputKeyUp} ></InputBase>
+              <Button variant="contained" startIcon={<SendRoundedIcon />} onClick={handleSendDanmaku}>发送</Button>
             </Paper>
           </Paper>
           {/* video info, like, coin, collections... */}
