@@ -239,7 +239,7 @@ return new Promise<ResponseMusic>((resolve, reject) => {
    */
   const handleCreatePost = () => {
     videoapi.createVideoPost({
-      createVideoPostDto: {
+      createVideoPostDTO: {
         title: videoTitle,
         description: videoDescription,
         coverUrl: coverPreviewUrl,
