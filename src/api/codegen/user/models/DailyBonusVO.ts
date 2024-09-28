@@ -24,19 +24,19 @@ export interface DailyBonusVO {
      * @type {number}
      * @memberof DailyBonusVO
      */
-    userId?: number;
+    userId: number;
     /**
      * 是否成功获得了登录奖励。若当天已获得奖励，该值为false
      * @type {boolean}
      * @memberof DailyBonusVO
      */
-    isGotBonus?: boolean;
+    isGotBonus: boolean;
     /**
      * 当前硬币数
      * @type {number}
      * @memberof DailyBonusVO
      */
-    currentCoins?: number;
+    currentCoins: number;
 }
 
 /**
@@ -44,6 +44,9 @@ export interface DailyBonusVO {
  */
 export function instanceOfDailyBonusVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "userId" in value;
+    isInstance = isInstance && "isGotBonus" in value;
+    isInstance = isInstance && "currentCoins" in value;
 
     return isInstance;
 }
@@ -58,9 +61,9 @@ export function DailyBonusVOFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'userId': !exists(json, 'userId') ? undefined : json['userId'],
-        'isGotBonus': !exists(json, 'isGotBonus') ? undefined : json['isGotBonus'],
-        'currentCoins': !exists(json, 'currentCoins') ? undefined : json['currentCoins'],
+        'userId': json['userId'],
+        'isGotBonus': json['isGotBonus'],
+        'currentCoins': json['currentCoins'],
     };
 }
 

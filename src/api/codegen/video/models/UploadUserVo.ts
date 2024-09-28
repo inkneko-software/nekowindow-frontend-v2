@@ -16,69 +16,74 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UploadUserVo
+ * @interface UploadUserVO
  */
-export interface UploadUserVo {
+export interface UploadUserVO {
     /**
      * 
      * @type {string}
-     * @memberof UploadUserVo
+     * @memberof UploadUserVO
      */
-    username?: string;
+    username: string;
     /**
      * 
      * @type {number}
-     * @memberof UploadUserVo
+     * @memberof UploadUserVO
      */
-    userId?: number;
+    userId: number;
     /**
      * 
      * @type {string}
-     * @memberof UploadUserVo
+     * @memberof UploadUserVO
      */
-    sign?: string;
+    sign: string;
     /**
      * 
      * @type {number}
-     * @memberof UploadUserVo
+     * @memberof UploadUserVO
      */
-    fans?: number;
+    fans: number;
     /**
      * 
      * @type {string}
-     * @memberof UploadUserVo
+     * @memberof UploadUserVO
      */
-    avatarUrl?: string;
+    avatarUrl: string;
 }
 
 /**
- * Check if a given object implements the UploadUserVo interface.
+ * Check if a given object implements the UploadUserVO interface.
  */
-export function instanceOfUploadUserVo(value: object): boolean {
+export function instanceOfUploadUserVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "username" in value;
+    isInstance = isInstance && "userId" in value;
+    isInstance = isInstance && "sign" in value;
+    isInstance = isInstance && "fans" in value;
+    isInstance = isInstance && "avatarUrl" in value;
 
     return isInstance;
 }
 
-export function UploadUserVoFromJSON(json: any): UploadUserVo {
-    return UploadUserVoFromJSONTyped(json, false);
+export function UploadUserVOFromJSON(json: any): UploadUserVO {
+    return UploadUserVOFromJSONTyped(json, false);
 }
 
-export function UploadUserVoFromJSONTyped(json: any, ignoreDiscriminator: boolean): UploadUserVo {
+export function UploadUserVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): UploadUserVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'username': !exists(json, 'username') ? undefined : json['username'],
-        'userId': !exists(json, 'userId') ? undefined : json['userId'],
-        'sign': !exists(json, 'sign') ? undefined : json['sign'],
-        'fans': !exists(json, 'fans') ? undefined : json['fans'],
-        'avatarUrl': !exists(json, 'avatarUrl') ? undefined : json['avatarUrl'],
+        'username': json['username'],
+        'userId': json['userId'],
+        'sign': json['sign'],
+        'fans': json['fans'],
+        'avatarUrl': json['avatarUrl'],
     };
 }
 
-export function UploadUserVoToJSON(value?: UploadUserVo | null): any {
+export function UploadUserVOToJSON(value?: UploadUserVO | null): any {
     if (value === undefined) {
         return undefined;
     }

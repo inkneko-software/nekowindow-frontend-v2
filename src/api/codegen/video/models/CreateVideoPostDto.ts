@@ -16,65 +16,65 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface CreateVideoPostDto
+ * @interface CreateVideoPostDTO
  */
-export interface CreateVideoPostDto {
+export interface CreateVideoPostDTO {
     /**
      * 
      * @type {string}
-     * @memberof CreateVideoPostDto
+     * @memberof CreateVideoPostDTO
      */
     title?: string;
     /**
      * 
      * @type {string}
-     * @memberof CreateVideoPostDto
+     * @memberof CreateVideoPostDTO
      */
     description?: string;
     /**
      * 
      * @type {string}
-     * @memberof CreateVideoPostDto
+     * @memberof CreateVideoPostDTO
      */
     coverUrl: string;
     /**
      * 
      * @type {number}
-     * @memberof CreateVideoPostDto
+     * @memberof CreateVideoPostDTO
      */
     partitionId: number;
     /**
      * 
-     * @type {Array<number>}
-     * @memberof CreateVideoPostDto
+     * @type {Array<string>}
+     * @memberof CreateVideoPostDTO
      */
-    tagIds: Array<number>;
+    tags: Array<string>;
     /**
      * 
      * @type {string}
-     * @memberof CreateVideoPostDto
+     * @memberof CreateVideoPostDTO
      */
     videoUrl: string;
 }
 
 /**
- * Check if a given object implements the CreateVideoPostDto interface.
+ * Check if a given object implements the CreateVideoPostDTO interface.
  */
-export function instanceOfCreateVideoPostDto(value: object): boolean {
+export function instanceOfCreateVideoPostDTO(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "coverUrl" in value;
     isInstance = isInstance && "partitionId" in value;
-    isInstance = isInstance && "tagIds" in value;
+    isInstance = isInstance && "tags" in value;
     isInstance = isInstance && "videoUrl" in value;
 
     return isInstance;
 }
 
-export function CreateVideoPostDtoFromJSON(json: any): CreateVideoPostDto {
-    return CreateVideoPostDtoFromJSONTyped(json, false);
+export function CreateVideoPostDTOFromJSON(json: any): CreateVideoPostDTO {
+    return CreateVideoPostDTOFromJSONTyped(json, false);
 }
 
-export function CreateVideoPostDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateVideoPostDto {
+export function CreateVideoPostDTOFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateVideoPostDTO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -84,12 +84,12 @@ export function CreateVideoPostDtoFromJSONTyped(json: any, ignoreDiscriminator: 
         'description': !exists(json, 'description') ? undefined : json['description'],
         'coverUrl': json['coverUrl'],
         'partitionId': json['partitionId'],
-        'tagIds': json['tagIds'],
+        'tags': json['tags'],
         'videoUrl': json['videoUrl'],
     };
 }
 
-export function CreateVideoPostDtoToJSON(value?: CreateVideoPostDto | null): any {
+export function CreateVideoPostDTOToJSON(value?: CreateVideoPostDTO | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -102,7 +102,7 @@ export function CreateVideoPostDtoToJSON(value?: CreateVideoPostDto | null): any
         'description': value.description,
         'coverUrl': value.coverUrl,
         'partitionId': value.partitionId,
-        'tagIds': value.tagIds,
+        'tags': value.tags,
         'videoUrl': value.videoUrl,
     };
 }

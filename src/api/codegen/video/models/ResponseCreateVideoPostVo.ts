@@ -13,53 +13,53 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import type { CreateVideoPostVo } from './CreateVideoPostVo';
+import type { CreateVideoPostVO } from './CreateVideoPostVO';
 import {
-    CreateVideoPostVoFromJSON,
-    CreateVideoPostVoFromJSONTyped,
-    CreateVideoPostVoToJSON,
-} from './CreateVideoPostVo';
+    CreateVideoPostVOFromJSON,
+    CreateVideoPostVOFromJSONTyped,
+    CreateVideoPostVOToJSON,
+} from './CreateVideoPostVO';
 
 /**
  * 
  * @export
- * @interface ResponseCreateVideoPostVo
+ * @interface ResponseCreateVideoPostVO
  */
-export interface ResponseCreateVideoPostVo {
+export interface ResponseCreateVideoPostVO {
     /**
      * 
      * @type {number}
-     * @memberof ResponseCreateVideoPostVo
+     * @memberof ResponseCreateVideoPostVO
      */
     code?: number;
     /**
      * 
      * @type {string}
-     * @memberof ResponseCreateVideoPostVo
+     * @memberof ResponseCreateVideoPostVO
      */
     message?: string;
     /**
      * 
-     * @type {CreateVideoPostVo}
-     * @memberof ResponseCreateVideoPostVo
+     * @type {CreateVideoPostVO}
+     * @memberof ResponseCreateVideoPostVO
      */
-    data?: CreateVideoPostVo;
+    data?: CreateVideoPostVO;
 }
 
 /**
- * Check if a given object implements the ResponseCreateVideoPostVo interface.
+ * Check if a given object implements the ResponseCreateVideoPostVO interface.
  */
-export function instanceOfResponseCreateVideoPostVo(value: object): boolean {
+export function instanceOfResponseCreateVideoPostVO(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ResponseCreateVideoPostVoFromJSON(json: any): ResponseCreateVideoPostVo {
-    return ResponseCreateVideoPostVoFromJSONTyped(json, false);
+export function ResponseCreateVideoPostVOFromJSON(json: any): ResponseCreateVideoPostVO {
+    return ResponseCreateVideoPostVOFromJSONTyped(json, false);
 }
 
-export function ResponseCreateVideoPostVoFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseCreateVideoPostVo {
+export function ResponseCreateVideoPostVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseCreateVideoPostVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -67,11 +67,11 @@ export function ResponseCreateVideoPostVoFromJSONTyped(json: any, ignoreDiscrimi
         
         'code': !exists(json, 'code') ? undefined : json['code'],
         'message': !exists(json, 'message') ? undefined : json['message'],
-        'data': !exists(json, 'data') ? undefined : CreateVideoPostVoFromJSON(json['data']),
+        'data': !exists(json, 'data') ? undefined : CreateVideoPostVOFromJSON(json['data']),
     };
 }
 
-export function ResponseCreateVideoPostVoToJSON(value?: ResponseCreateVideoPostVo | null): any {
+export function ResponseCreateVideoPostVOToJSON(value?: ResponseCreateVideoPostVO | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -82,7 +82,7 @@ export function ResponseCreateVideoPostVoToJSON(value?: ResponseCreateVideoPostV
         
         'code': value.code,
         'message': value.message,
-        'data': CreateVideoPostVoToJSON(value.data),
+        'data': CreateVideoPostVOToJSON(value.data),
     };
 }
 

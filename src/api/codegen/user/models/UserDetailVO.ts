@@ -24,61 +24,61 @@ export interface UserDetailVO {
      * @type {number}
      * @memberof UserDetailVO
      */
-    uid?: number;
+    uid: number;
     /**
      * 
      * @type {string}
      * @memberof UserDetailVO
      */
-    username?: string;
+    username: string;
     /**
      * 
      * @type {string}
      * @memberof UserDetailVO
      */
-    sign?: string;
+    sign: string;
     /**
      * 
      * @type {number}
      * @memberof UserDetailVO
      */
-    exp?: number;
+    exp: number;
     /**
      * 
      * @type {string}
      * @memberof UserDetailVO
      */
-    gender?: string;
+    gender: string;
     /**
      * 
      * @type {Date}
      * @memberof UserDetailVO
      */
-    birth?: Date;
+    birth: Date;
     /**
      * 
      * @type {string}
      * @memberof UserDetailVO
      */
-    avatarUrl?: string;
+    avatarUrl: string;
     /**
      * 
      * @type {string}
      * @memberof UserDetailVO
      */
-    bannerUrl?: string;
+    bannerUrl: string;
     /**
      * 
      * @type {number}
      * @memberof UserDetailVO
      */
-    fans?: number;
+    fans: number;
     /**
      * 
      * @type {number}
      * @memberof UserDetailVO
      */
-    subscribes?: number;
+    subscribes: number;
 }
 
 /**
@@ -86,6 +86,16 @@ export interface UserDetailVO {
  */
 export function instanceOfUserDetailVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "uid" in value;
+    isInstance = isInstance && "username" in value;
+    isInstance = isInstance && "sign" in value;
+    isInstance = isInstance && "exp" in value;
+    isInstance = isInstance && "gender" in value;
+    isInstance = isInstance && "birth" in value;
+    isInstance = isInstance && "avatarUrl" in value;
+    isInstance = isInstance && "bannerUrl" in value;
+    isInstance = isInstance && "fans" in value;
+    isInstance = isInstance && "subscribes" in value;
 
     return isInstance;
 }
@@ -100,16 +110,16 @@ export function UserDetailVOFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'uid': !exists(json, 'uid') ? undefined : json['uid'],
-        'username': !exists(json, 'username') ? undefined : json['username'],
-        'sign': !exists(json, 'sign') ? undefined : json['sign'],
-        'exp': !exists(json, 'exp') ? undefined : json['exp'],
-        'gender': !exists(json, 'gender') ? undefined : json['gender'],
-        'birth': !exists(json, 'birth') ? undefined : (new Date(json['birth'])),
-        'avatarUrl': !exists(json, 'avatarUrl') ? undefined : json['avatarUrl'],
-        'bannerUrl': !exists(json, 'bannerUrl') ? undefined : json['bannerUrl'],
-        'fans': !exists(json, 'fans') ? undefined : json['fans'],
-        'subscribes': !exists(json, 'subscribes') ? undefined : json['subscribes'],
+        'uid': json['uid'],
+        'username': json['username'],
+        'sign': json['sign'],
+        'exp': json['exp'],
+        'gender': json['gender'],
+        'birth': (new Date(json['birth'])),
+        'avatarUrl': json['avatarUrl'],
+        'bannerUrl': json['bannerUrl'],
+        'fans': json['fans'],
+        'subscribes': json['subscribes'],
     };
 }
 
@@ -127,7 +137,7 @@ export function UserDetailVOToJSON(value?: UserDetailVO | null): any {
         'sign': value.sign,
         'exp': value.exp,
         'gender': value.gender,
-        'birth': value.birth === undefined ? undefined : (value.birth.toISOString()),
+        'birth': (value.birth.toISOString()),
         'avatarUrl': value.avatarUrl,
         'bannerUrl': value.bannerUrl,
         'fans': value.fans,

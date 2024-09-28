@@ -15,40 +15,45 @@
 
 import * as runtime from '../runtime';
 import type {
-  AddTagDto,
-  CreateVideoPostDto,
-  ResponseCreateVideoPostVo,
+  CreateVideoPostDTO,
+  ResponseCreateVideoPostVO,
+  ResponseHomeRecommendVO,
   ResponseListPartitionInfo,
-  ResponseListPartitionRecommendTag,
+  ResponseListString,
+  ResponseListVideoPostBriefVO,
   ResponseString,
-  ResponseTag,
-  ResponseVideoPostBriefVo,
+  ResponseVideoPostBriefVO,
+  ResponseVideoPostDetailVO,
 } from '../models/index';
 import {
-    AddTagDtoFromJSON,
-    AddTagDtoToJSON,
-    CreateVideoPostDtoFromJSON,
-    CreateVideoPostDtoToJSON,
-    ResponseCreateVideoPostVoFromJSON,
-    ResponseCreateVideoPostVoToJSON,
+    CreateVideoPostDTOFromJSON,
+    CreateVideoPostDTOToJSON,
+    ResponseCreateVideoPostVOFromJSON,
+    ResponseCreateVideoPostVOToJSON,
+    ResponseHomeRecommendVOFromJSON,
+    ResponseHomeRecommendVOToJSON,
     ResponseListPartitionInfoFromJSON,
     ResponseListPartitionInfoToJSON,
-    ResponseListPartitionRecommendTagFromJSON,
-    ResponseListPartitionRecommendTagToJSON,
+    ResponseListStringFromJSON,
+    ResponseListStringToJSON,
+    ResponseListVideoPostBriefVOFromJSON,
+    ResponseListVideoPostBriefVOToJSON,
     ResponseStringFromJSON,
     ResponseStringToJSON,
-    ResponseTagFromJSON,
-    ResponseTagToJSON,
-    ResponseVideoPostBriefVoFromJSON,
-    ResponseVideoPostBriefVoToJSON,
+    ResponseVideoPostBriefVOFromJSON,
+    ResponseVideoPostBriefVOToJSON,
+    ResponseVideoPostDetailVOFromJSON,
+    ResponseVideoPostDetailVOToJSON,
 } from '../models/index';
 
-export interface AddTagRequest {
-    addTagDto: AddTagDto;
+export interface CreateVideoPostRequest {
+    createVideoPostDTO: CreateVideoPostDTO;
 }
 
-export interface CreateVideoPostRequest {
-    createVideoPostDto: CreateVideoPostDto;
+export interface GetPartitionLatestVideoRequest {
+    partitionId: number;
+    page?: number;
+    size?: number;
 }
 
 export interface GetPartitionRecommendTagListRequest {
@@ -59,17 +64,21 @@ export interface GetVideoPostBriefRequest {
     nkid: number;
 }
 
+export interface GetVideoPostDetailRequest {
+    nkid: number;
+}
+
 /**
  * 
  */
 export class VideoControllerApi extends runtime.BaseAPI {
 
     /**
-     * 添加标签
+     * 创建视频投稿
      */
-    async addTagRaw(requestParameters: AddTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseTag>> {
-        if (requestParameters.addTagDto === null || requestParameters.addTagDto === undefined) {
-            throw new runtime.RequiredError('addTagDto','Required parameter requestParameters.addTagDto was null or undefined when calling addTag.');
+    async createVideoPostRaw(requestParameters: CreateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseCreateVideoPostVO>> {
+        if (requestParameters.createVideoPostDTO === null || requestParameters.createVideoPostDTO === undefined) {
+            throw new runtime.RequiredError('createVideoPostDTO','Required parameter requestParameters.createVideoPostDTO was null or undefined when calling createVideoPost.');
         }
 
         const queryParameters: any = {};
@@ -79,53 +88,20 @@ export class VideoControllerApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/api/v1/video/video/addTag`,
+            path: `/api/v1/video/createVideoPost`,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
-            body: AddTagDtoToJSON(requestParameters.addTagDto),
+            body: CreateVideoPostDTOToJSON(requestParameters.createVideoPostDTO),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseTagFromJSON(jsonValue));
-    }
-
-    /**
-     * 添加标签
-     */
-    async addTag(requestParameters: AddTagRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseTag> {
-        const response = await this.addTagRaw(requestParameters, initOverrides);
-        return await response.value();
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseCreateVideoPostVOFromJSON(jsonValue));
     }
 
     /**
      * 创建视频投稿
      */
-    async createVideoPostRaw(requestParameters: CreateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseCreateVideoPostVo>> {
-        if (requestParameters.createVideoPostDto === null || requestParameters.createVideoPostDto === undefined) {
-            throw new runtime.RequiredError('createVideoPostDto','Required parameter requestParameters.createVideoPostDto was null or undefined when calling createVideoPost.');
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/api/v1/video/video/createVideoPost`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: CreateVideoPostDtoToJSON(requestParameters.createVideoPostDto),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseCreateVideoPostVoFromJSON(jsonValue));
-    }
-
-    /**
-     * 创建视频投稿
-     */
-    async createVideoPost(requestParameters: CreateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseCreateVideoPostVo> {
+    async createVideoPost(requestParameters: CreateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseCreateVideoPostVO> {
         const response = await this.createVideoPostRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -140,7 +116,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/video/generateCoverUploadUrl`,
+            path: `/api/v1/video/generateCoverUploadUrl`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -168,7 +144,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/video/generateUploadUrl`,
+            path: `/api/v1/video/generateUploadUrl`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -187,6 +163,74 @@ export class VideoControllerApi extends runtime.BaseAPI {
     }
 
     /**
+     * 获取首页推荐
+     */
+    async getHomeRecommendRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseHomeRecommendVO>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/getHomePageRecommend`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseHomeRecommendVOFromJSON(jsonValue));
+    }
+
+    /**
+     * 获取首页推荐
+     */
+    async getHomeRecommend(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseHomeRecommendVO> {
+        const response = await this.getHomeRecommendRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 查询指定分区视频，以时间倒序
+     */
+    async getPartitionLatestVideoRaw(requestParameters: GetPartitionLatestVideoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListVideoPostBriefVO>> {
+        if (requestParameters.partitionId === null || requestParameters.partitionId === undefined) {
+            throw new runtime.RequiredError('partitionId','Required parameter requestParameters.partitionId was null or undefined when calling getPartitionLatestVideo.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.partitionId !== undefined) {
+            queryParameters['partitionId'] = requestParameters.partitionId;
+        }
+
+        if (requestParameters.page !== undefined) {
+            queryParameters['page'] = requestParameters.page;
+        }
+
+        if (requestParameters.size !== undefined) {
+            queryParameters['size'] = requestParameters.size;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/getPartitionVideos`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListVideoPostBriefVOFromJSON(jsonValue));
+    }
+
+    /**
+     * 查询指定分区视频，以时间倒序
+     */
+    async getPartitionLatestVideo(requestParameters: GetPartitionLatestVideoRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListVideoPostBriefVO> {
+        const response = await this.getPartitionLatestVideoRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * 查询所有的分区
      */
     async getPartitionListRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListPartitionInfo>> {
@@ -195,7 +239,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/video/getPartitionList`,
+            path: `/api/v1/video/getPartitionList`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -215,7 +259,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
     /**
      * 查询指定分区的推荐标签
      */
-    async getPartitionRecommendTagListRaw(requestParameters: GetPartitionRecommendTagListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListPartitionRecommendTag>> {
+    async getPartitionRecommendTagListRaw(requestParameters: GetPartitionRecommendTagListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListString>> {
         if (requestParameters.partitionId === null || requestParameters.partitionId === undefined) {
             throw new runtime.RequiredError('partitionId','Required parameter requestParameters.partitionId was null or undefined when calling getPartitionRecommendTagList.');
         }
@@ -229,19 +273,19 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/video/getPartitionRecommendTagList`,
+            path: `/api/v1/video/getPartitionRecommendTagList`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListPartitionRecommendTagFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListStringFromJSON(jsonValue));
     }
 
     /**
      * 查询指定分区的推荐标签
      */
-    async getPartitionRecommendTagList(requestParameters: GetPartitionRecommendTagListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListPartitionRecommendTag> {
+    async getPartitionRecommendTagList(requestParameters: GetPartitionRecommendTagListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListString> {
         const response = await this.getPartitionRecommendTagListRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -249,7 +293,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
     /**
      * 查询视频信息
      */
-    async getVideoPostBriefRaw(requestParameters: GetVideoPostBriefRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseVideoPostBriefVo>> {
+    async getVideoPostBriefRaw(requestParameters: GetVideoPostBriefRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseVideoPostBriefVO>> {
         if (requestParameters.nkid === null || requestParameters.nkid === undefined) {
             throw new runtime.RequiredError('nkid','Required parameter requestParameters.nkid was null or undefined when calling getVideoPostBrief.');
         }
@@ -263,20 +307,54 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/video/getVideoPostBrief`,
+            path: `/api/v1/video/getVideoPostBrief`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseVideoPostBriefVoFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseVideoPostBriefVOFromJSON(jsonValue));
     }
 
     /**
      * 查询视频信息
      */
-    async getVideoPostBrief(requestParameters: GetVideoPostBriefRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseVideoPostBriefVo> {
+    async getVideoPostBrief(requestParameters: GetVideoPostBriefRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseVideoPostBriefVO> {
         const response = await this.getVideoPostBriefRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 获取视频详细信息
+     */
+    async getVideoPostDetailRaw(requestParameters: GetVideoPostDetailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseVideoPostDetailVO>> {
+        if (requestParameters.nkid === null || requestParameters.nkid === undefined) {
+            throw new runtime.RequiredError('nkid','Required parameter requestParameters.nkid was null or undefined when calling getVideoPostDetail.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.nkid !== undefined) {
+            queryParameters['nkid'] = requestParameters.nkid;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/getVideoPostDetail`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseVideoPostDetailVOFromJSON(jsonValue));
+    }
+
+    /**
+     * 获取视频详细信息
+     */
+    async getVideoPostDetail(requestParameters: GetVideoPostDetailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseVideoPostDetailVO> {
+        const response = await this.getVideoPostDetailRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

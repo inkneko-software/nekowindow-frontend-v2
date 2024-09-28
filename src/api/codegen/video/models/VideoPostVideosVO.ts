@@ -16,39 +16,39 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface VideoPostResourceVO
+ * @interface VideoPostVideosVO
  */
-export interface VideoPostResourceVO {
+export interface VideoPostVideosVO {
     /**
      * 
      * @type {number}
-     * @memberof VideoPostResourceVO
+     * @memberof VideoPostVideosVO
      */
     videoId: number;
     /**
      * 
      * @type {string}
-     * @memberof VideoPostResourceVO
+     * @memberof VideoPostVideosVO
      */
     title: string;
     /**
      * 
      * @type {number}
-     * @memberof VideoPostResourceVO
+     * @memberof VideoPostVideosVO
      */
     visit: number;
     /**
      * 
      * @type {string}
-     * @memberof VideoPostResourceVO
+     * @memberof VideoPostVideosVO
      */
     dashMpdUrl: string;
 }
 
 /**
- * Check if a given object implements the VideoPostResourceVO interface.
+ * Check if a given object implements the VideoPostVideosVO interface.
  */
-export function instanceOfVideoPostResourceVO(value: object): boolean {
+export function instanceOfVideoPostVideosVO(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "videoId" in value;
     isInstance = isInstance && "title" in value;
@@ -58,11 +58,11 @@ export function instanceOfVideoPostResourceVO(value: object): boolean {
     return isInstance;
 }
 
-export function VideoPostResourceVOFromJSON(json: any): VideoPostResourceVO {
-    return VideoPostResourceVOFromJSONTyped(json, false);
+export function VideoPostVideosVOFromJSON(json: any): VideoPostVideosVO {
+    return VideoPostVideosVOFromJSONTyped(json, false);
 }
 
-export function VideoPostResourceVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): VideoPostResourceVO {
+export function VideoPostVideosVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): VideoPostVideosVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -75,7 +75,7 @@ export function VideoPostResourceVOFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function VideoPostResourceVOToJSON(value?: VideoPostResourceVO | null): any {
+export function VideoPostVideosVOToJSON(value?: VideoPostVideosVO | null): any {
     if (value === undefined) {
         return undefined;
     }

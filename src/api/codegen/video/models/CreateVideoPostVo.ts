@@ -16,41 +16,42 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface CreateVideoPostVo
+ * @interface CreateVideoPostVO
  */
-export interface CreateVideoPostVo {
+export interface CreateVideoPostVO {
     /**
      * 
      * @type {number}
-     * @memberof CreateVideoPostVo
+     * @memberof CreateVideoPostVO
      */
-    nkid?: number;
+    nkid: number;
 }
 
 /**
- * Check if a given object implements the CreateVideoPostVo interface.
+ * Check if a given object implements the CreateVideoPostVO interface.
  */
-export function instanceOfCreateVideoPostVo(value: object): boolean {
+export function instanceOfCreateVideoPostVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "nkid" in value;
 
     return isInstance;
 }
 
-export function CreateVideoPostVoFromJSON(json: any): CreateVideoPostVo {
-    return CreateVideoPostVoFromJSONTyped(json, false);
+export function CreateVideoPostVOFromJSON(json: any): CreateVideoPostVO {
+    return CreateVideoPostVOFromJSONTyped(json, false);
 }
 
-export function CreateVideoPostVoFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateVideoPostVo {
+export function CreateVideoPostVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): CreateVideoPostVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
     return {
         
-        'nkid': !exists(json, 'nkid') ? undefined : json['nkid'],
+        'nkid': json['nkid'],
     };
 }
 
-export function CreateVideoPostVoToJSON(value?: CreateVideoPostVo | null): any {
+export function CreateVideoPostVOToJSON(value?: CreateVideoPostVO | null): any {
     if (value === undefined) {
         return undefined;
     }

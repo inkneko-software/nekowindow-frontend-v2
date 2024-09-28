@@ -19,78 +19,91 @@ import {
     UploadUserVOFromJSONTyped,
     UploadUserVOToJSON,
 } from './UploadUserVO';
+import type { VideoPostResourceVO } from './VideoPostResourceVO';
+import {
+    VideoPostResourceVOFromJSON,
+    VideoPostResourceVOFromJSONTyped,
+    VideoPostResourceVOToJSON,
+} from './VideoPostResourceVO';
 
 /**
  * 
  * @export
- * @interface VideoPostBriefVO
+ * @interface VideoPostDetailVO
  */
-export interface VideoPostBriefVO {
+export interface VideoPostDetailVO {
     /**
      * 
      * @type {number}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     nkid: number;
     /**
      * 
      * @type {string}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     title: string;
     /**
      * 
      * @type {string}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     description: string;
     /**
      * 
      * @type {string}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     coverUrl: string;
     /**
      * 
      * @type {UploadUserVO}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     uploader: UploadUserVO;
     /**
      * 
+     * @type {Array<VideoPostResourceVO>}
+     * @memberof VideoPostDetailVO
+     */
+    videos: Array<VideoPostResourceVO>;
+    /**
+     * 
      * @type {Array<string>}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     tags: Array<string>;
     /**
      * 
      * @type {Date}
-     * @memberof VideoPostBriefVO
+     * @memberof VideoPostDetailVO
      */
     createdAt: Date;
 }
 
 /**
- * Check if a given object implements the VideoPostBriefVO interface.
+ * Check if a given object implements the VideoPostDetailVO interface.
  */
-export function instanceOfVideoPostBriefVO(value: object): boolean {
+export function instanceOfVideoPostDetailVO(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "nkid" in value;
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "coverUrl" in value;
     isInstance = isInstance && "uploader" in value;
+    isInstance = isInstance && "videos" in value;
     isInstance = isInstance && "tags" in value;
     isInstance = isInstance && "createdAt" in value;
 
     return isInstance;
 }
 
-export function VideoPostBriefVOFromJSON(json: any): VideoPostBriefVO {
-    return VideoPostBriefVOFromJSONTyped(json, false);
+export function VideoPostDetailVOFromJSON(json: any): VideoPostDetailVO {
+    return VideoPostDetailVOFromJSONTyped(json, false);
 }
 
-export function VideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): VideoPostBriefVO {
+export function VideoPostDetailVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): VideoPostDetailVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -101,12 +114,13 @@ export function VideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: bo
         'description': json['description'],
         'coverUrl': json['coverUrl'],
         'uploader': UploadUserVOFromJSON(json['uploader']),
+        'videos': ((json['videos'] as Array<any>).map(VideoPostResourceVOFromJSON)),
         'tags': json['tags'],
         'createdAt': (new Date(json['createdAt'])),
     };
 }
 
-export function VideoPostBriefVOToJSON(value?: VideoPostBriefVO | null): any {
+export function VideoPostDetailVOToJSON(value?: VideoPostDetailVO | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -120,6 +134,7 @@ export function VideoPostBriefVOToJSON(value?: VideoPostBriefVO | null): any {
         'description': value.description,
         'coverUrl': value.coverUrl,
         'uploader': UploadUserVOToJSON(value.uploader),
+        'videos': ((value.videos as Array<any>).map(VideoPostResourceVOToJSON)),
         'tags': value.tags,
         'createdAt': (value.createdAt.toISOString()),
     };

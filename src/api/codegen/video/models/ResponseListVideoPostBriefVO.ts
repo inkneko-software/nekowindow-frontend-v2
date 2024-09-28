@@ -23,43 +23,43 @@ import {
 /**
  * 
  * @export
- * @interface ResponseVideoPostBriefVO
+ * @interface ResponseListVideoPostBriefVO
  */
-export interface ResponseVideoPostBriefVO {
+export interface ResponseListVideoPostBriefVO {
     /**
      * 
      * @type {number}
-     * @memberof ResponseVideoPostBriefVO
+     * @memberof ResponseListVideoPostBriefVO
      */
     code?: number;
     /**
      * 
      * @type {string}
-     * @memberof ResponseVideoPostBriefVO
+     * @memberof ResponseListVideoPostBriefVO
      */
     message?: string;
     /**
      * 
-     * @type {VideoPostBriefVO}
-     * @memberof ResponseVideoPostBriefVO
+     * @type {Array<VideoPostBriefVO>}
+     * @memberof ResponseListVideoPostBriefVO
      */
-    data?: VideoPostBriefVO;
+    data?: Array<VideoPostBriefVO>;
 }
 
 /**
- * Check if a given object implements the ResponseVideoPostBriefVO interface.
+ * Check if a given object implements the ResponseListVideoPostBriefVO interface.
  */
-export function instanceOfResponseVideoPostBriefVO(value: object): boolean {
+export function instanceOfResponseListVideoPostBriefVO(value: object): boolean {
     let isInstance = true;
 
     return isInstance;
 }
 
-export function ResponseVideoPostBriefVOFromJSON(json: any): ResponseVideoPostBriefVO {
-    return ResponseVideoPostBriefVOFromJSONTyped(json, false);
+export function ResponseListVideoPostBriefVOFromJSON(json: any): ResponseListVideoPostBriefVO {
+    return ResponseListVideoPostBriefVOFromJSONTyped(json, false);
 }
 
-export function ResponseVideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseVideoPostBriefVO {
+export function ResponseListVideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): ResponseListVideoPostBriefVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -67,11 +67,11 @@ export function ResponseVideoPostBriefVOFromJSONTyped(json: any, ignoreDiscrimin
         
         'code': !exists(json, 'code') ? undefined : json['code'],
         'message': !exists(json, 'message') ? undefined : json['message'],
-        'data': !exists(json, 'data') ? undefined : VideoPostBriefVOFromJSON(json['data']),
+        'data': !exists(json, 'data') ? undefined : ((json['data'] as Array<any>).map(VideoPostBriefVOFromJSON)),
     };
 }
 
-export function ResponseVideoPostBriefVOToJSON(value?: ResponseVideoPostBriefVO | null): any {
+export function ResponseListVideoPostBriefVOToJSON(value?: ResponseListVideoPostBriefVO | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -82,7 +82,7 @@ export function ResponseVideoPostBriefVOToJSON(value?: ResponseVideoPostBriefVO 
         
         'code': value.code,
         'message': value.message,
-        'data': VideoPostBriefVOToJSON(value.data),
+        'data': value.data === undefined ? undefined : ((value.data as Array<any>).map(VideoPostBriefVOToJSON)),
     };
 }
 
