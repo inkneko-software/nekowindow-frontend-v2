@@ -1,6 +1,18 @@
 /** @type {import('next').NextConfig} */
 import { env } from 'process';
 
+/**
+ * 获取API服务器
+ * @returns 如果环境变量中定义了API_SERVER，则使用该值，否则使用空串，即当前访问的服务器
+ */
+const getBasePath = () => {
+  if (env.API_SERVER !== undefined && typeof (env.API_SERVER) === 'string') {
+    return env.API_SERVER;
+  }
+
+  return '';
+}
+
 const nextConfig = {
   reactStrictMode: true,
   rewrites: async function () {
@@ -27,6 +39,9 @@ const nextConfig = {
 
     return [];
   },
+  env: {
+    basePath: getBasePath()
+  }
 };
 
 export default nextConfig;
