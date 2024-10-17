@@ -20,9 +20,9 @@ import Head from 'next/head';
 import DefaultErrorPage from 'next/error'
 import { useRouter } from 'next/navigation';
 import NepPlayer, { CustomDanmakuEvent } from '@components/NepPlayer/NepPlayer';
-import { VideoControllerApi } from '@api/codegen/video';
+import { Configuration, VideoControllerApi } from '@api/codegen/video';
 
-const videoapi = new VideoControllerApi();
+const videoapi = new VideoControllerApi(new Configuration({credentials: 'include', basePath: process.env.basePath}));
 
 const SocialSection = styled('div')(({ theme }) => ({
   marginTop: "5px",

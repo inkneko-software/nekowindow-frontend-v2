@@ -27,9 +27,9 @@ import { UploadDialog } from './UploadDialog';
 
 import { Configuration, PartitionInfo, UserUploadedVideoStatisticsVO, VideoControllerApi, VideoManagementControllerApi, VideoPostBriefVO } from '@api/codegen/video';
 
-var videoAPI = new VideoControllerApi(new Configuration({ credentials: "include" }))
+var videoAPI = new VideoControllerApi(new Configuration({ credentials: "include", basePath: process.env.basePath }))
 
-var videoManagementAPI = new VideoManagementControllerApi(new Configuration({ credentials: "include" }))
+var videoManagementAPI = new VideoManagementControllerApi(new Configuration({ credentials: "include", basePath: process.env.basePath  }))
 
 const UploadHome: React.FC = () => {
   const [uploadDialogOpen, setUploadDialogOpen] = React.useState(true)

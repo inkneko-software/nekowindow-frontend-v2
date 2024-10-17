@@ -9,7 +9,7 @@ import theme from '@theme/theme';
 import { Configuration, UserControllerApi } from '@api/codegen/user';
 import useToast from '@components/Common/Toast';
 
-const userControllerApi = new UserControllerApi(new Configuration({credentials: 'include'}));
+const userControllerApi = new UserControllerApi(new Configuration({credentials: 'include', basePath: process.env.basePath}));
 
 interface LoginDialogProps {
   open: boolean,
