@@ -12,11 +12,9 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import TextField from '@mui/material/TextField';
 import {zhCN} from 'date-fns/locale/zh-CN';
-export interface AccountMyInfoProps {
-    hidden?: boolean
-}
 
-export default function AccountMyInfo(props: AccountMyInfoProps) {
+
+export default function AccountMyInfo() {
 
     const [timeValue, setTimeValue] = React.useState<Date|null>(new Date('2014-08-18T21:11:54'));
     const [info, setInfo] = React.useState({
@@ -83,7 +81,7 @@ export default function AccountMyInfo(props: AccountMyInfoProps) {
     }
 
     return (
-        <Box hidden={props.hidden} >
+        <Box  >
             <Typography>我的信息</Typography>
             <Divider sx={{ marginTop: 3, marginBottom: 3 }} />
             <Box sx={{ display: "flex", marginBottom: 3 }}>

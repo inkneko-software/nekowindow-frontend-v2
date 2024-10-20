@@ -6,11 +6,8 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { Button, Checkbox, Chip, Divider, FormControlLabel } from '@mui/material';
 import Link from 'next/link';
-export interface AccountAvatarProps {
-    hidden?: boolean
-}
 
-export default function AccountAvatar(props: AccountAvatarProps) {
+export default function AccountAvatar() {
     const [info, setInfo] = React.useState({ uid: 0, face_url: "", nick: "", exp: 0 })
     const faceInputRef = React.useRef(null)
     // React.useEffect(() => {
@@ -70,7 +67,7 @@ export default function AccountAvatar(props: AccountAvatarProps) {
     }
 
     return (
-        <Box hidden={props.hidden} >
+        <Box  >
             <form>
                 <input ref={faceInputRef} type="file" hidden={true} accept=".jpeg,.jpg,.png,.gif" multiple={false} />
             </form>

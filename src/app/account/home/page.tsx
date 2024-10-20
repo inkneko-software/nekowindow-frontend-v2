@@ -7,11 +7,8 @@ import Typography from '@mui/material/Typography';
 import { Button, Checkbox, Chip, Divider, FormControlLabel } from '@mui/material';
 import Link from 'next/link';
 
-export interface AccountHomeProps {
-  hidden?: boolean
-}
 
-export default function AccountHome(props: AccountHomeProps) {
+export default function AccountHome() {
   const [info, setInfo] = React.useState({ uid: 0, face_url: "", nick: "", exp: 0 })
   // React.useEffect(() => {
   //     member.GetUser(null)
@@ -37,7 +34,7 @@ export default function AccountHome(props: AccountHomeProps) {
   var currentLevelProgress = (info.exp / currentLevelExp) * 100
 
   return (
-    <Box hidden={props.hidden} >
+    <Box>
       <Box sx={{ display: "flex", flexDirection: "row" }}>
         <Avatar sx={{ width: "64px", height: "64px" }} src={info.face_url} />
         <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 2, flexGrow: 1 }}>

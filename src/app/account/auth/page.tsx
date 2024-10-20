@@ -7,11 +7,7 @@ import Typography from '@mui/material/Typography';
 import { Button, Checkbox, Chip, Divider, FormControlLabel, OutlinedInput } from '@mui/material';
 import Link from 'next/link';
 
-export interface AccountAuthProps {
-    hidden?: boolean
-}
-
-export default function AccountAuth(props: AccountAuthProps) {
+export default function AccountAuth() {
     const [info, setInfo] = React.useState({ uid: 0, face_url: "", nick: "", exp: 0 })
     React.useEffect(() => {
         // member.GetUser(null)
@@ -32,7 +28,7 @@ export default function AccountAuth(props: AccountAuthProps) {
     }, [])
 
     return (
-        <Box hidden={props.hidden} >
+        <Box  >
             <Typography>账户安全</Typography>
             <Divider sx={{ marginTop: 3, marginBottom: 3 }} />
 
