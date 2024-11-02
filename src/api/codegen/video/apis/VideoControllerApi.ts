@@ -20,6 +20,7 @@ import type {
   ResponseHomeRecommendVO,
   ResponseListPartitionInfo,
   ResponseListString,
+  ResponseListUserUploadedVideoStatisticsVO,
   ResponseListVideoPostBriefVO,
   ResponseString,
   ResponseVideoPostBriefVO,
@@ -36,6 +37,8 @@ import {
     ResponseListPartitionInfoToJSON,
     ResponseListStringFromJSON,
     ResponseListStringToJSON,
+    ResponseListUserUploadedVideoStatisticsVOFromJSON,
+    ResponseListUserUploadedVideoStatisticsVOToJSON,
     ResponseListVideoPostBriefVOFromJSON,
     ResponseListVideoPostBriefVOToJSON,
     ResponseStringFromJSON,
@@ -58,6 +61,12 @@ export interface GetPartitionLatestVideoRequest {
 
 export interface GetPartitionRecommendTagListRequest {
     partitionId: number;
+}
+
+export interface GetUserPostsRequest {
+    uid: number;
+    page?: number;
+    size?: number;
 }
 
 export interface GetVideoPostBriefRequest {
@@ -287,6 +296,48 @@ export class VideoControllerApi extends runtime.BaseAPI {
      */
     async getPartitionRecommendTagList(requestParameters: GetPartitionRecommendTagListRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListString> {
         const response = await this.getPartitionRecommendTagListRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 获取已上传视频列表
+     */
+    async getUserPostsRaw(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListUserUploadedVideoStatisticsVO>> {
+        if (requestParameters.uid === null || requestParameters.uid === undefined) {
+            throw new runtime.RequiredError('uid','Required parameter requestParameters.uid was null or undefined when calling getUserPosts.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.uid !== undefined) {
+            queryParameters['uid'] = requestParameters.uid;
+        }
+
+        if (requestParameters.page !== undefined) {
+            queryParameters['page'] = requestParameters.page;
+        }
+
+        if (requestParameters.size !== undefined) {
+            queryParameters['size'] = requestParameters.size;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/getUploadedVideos`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListUserUploadedVideoStatisticsVOFromJSON(jsonValue));
+    }
+
+    /**
+     * 获取已上传视频列表
+     */
+    async getUserPosts(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListUserUploadedVideoStatisticsVO> {
+        const response = await this.getUserPostsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

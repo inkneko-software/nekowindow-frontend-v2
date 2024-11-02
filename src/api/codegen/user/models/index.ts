@@ -1,8 +1,8 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './DailyBonusVO';
 export * from './EmailLoginDTO';
-export * from './ResponseDailyBonusVO';
+export * from './MyUserDetailVO';
+export * from './ResponseMyUserDetailVO';
 export * from './ResponseObject';
 export * from './ResponseUserDetailVO';
 export * from './SendLoginEmailCodeDTO';

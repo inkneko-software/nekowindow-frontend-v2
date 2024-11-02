@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/VideoControllerApi.ts
 apis/VideoInternalControllerApi.ts
 apis/VideoManagementControllerApi.ts

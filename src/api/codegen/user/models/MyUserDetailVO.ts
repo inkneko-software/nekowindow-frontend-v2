@@ -16,87 +16,93 @@ import { exists, mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface UserDetailVO
+ * @interface MyUserDetailVO
  */
-export interface UserDetailVO {
+export interface MyUserDetailVO {
     /**
      * 
      * @type {number}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     uid: number;
     /**
      * 
      * @type {string}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     username: string;
     /**
      * 
      * @type {string}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     sign: string;
     /**
      * 
      * @type {number}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     exp: number;
     /**
      * 
      * @type {string}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     gender: string;
     /**
      * 
      * @type {Date}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     birth: Date;
     /**
      * 
      * @type {string}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     avatarUrl: string;
     /**
      * 
      * @type {string}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     bannerUrl: string;
     /**
      * 
      * @type {number}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     fans: number;
     /**
      * 
      * @type {number}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
      */
     subscribes: number;
     /**
      * 
      * @type {number}
-     * @memberof UserDetailVO
+     * @memberof MyUserDetailVO
+     */
+    coins: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof MyUserDetailVO
      */
     followers: number;
     /**
      * 
-     * @type {number}
-     * @memberof UserDetailVO
+     * @type {boolean}
+     * @memberof MyUserDetailVO
      */
-    coins: number;
+    isGotDailyBonus: boolean;
 }
 
 /**
- * Check if a given object implements the UserDetailVO interface.
+ * Check if a given object implements the MyUserDetailVO interface.
  */
-export function instanceOfUserDetailVO(value: object): boolean {
+export function instanceOfMyUserDetailVO(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "uid" in value;
     isInstance = isInstance && "username" in value;
@@ -108,17 +114,18 @@ export function instanceOfUserDetailVO(value: object): boolean {
     isInstance = isInstance && "bannerUrl" in value;
     isInstance = isInstance && "fans" in value;
     isInstance = isInstance && "subscribes" in value;
-    isInstance = isInstance && "followers" in value;
     isInstance = isInstance && "coins" in value;
+    isInstance = isInstance && "followers" in value;
+    isInstance = isInstance && "isGotDailyBonus" in value;
 
     return isInstance;
 }
 
-export function UserDetailVOFromJSON(json: any): UserDetailVO {
-    return UserDetailVOFromJSONTyped(json, false);
+export function MyUserDetailVOFromJSON(json: any): MyUserDetailVO {
+    return MyUserDetailVOFromJSONTyped(json, false);
 }
 
-export function UserDetailVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): UserDetailVO {
+export function MyUserDetailVOFromJSONTyped(json: any, ignoreDiscriminator: boolean): MyUserDetailVO {
     if ((json === undefined) || (json === null)) {
         return json;
     }
@@ -134,12 +141,13 @@ export function UserDetailVOFromJSONTyped(json: any, ignoreDiscriminator: boolea
         'bannerUrl': json['bannerUrl'],
         'fans': json['fans'],
         'subscribes': json['subscribes'],
-        'followers': json['followers'],
         'coins': json['coins'],
+        'followers': json['followers'],
+        'isGotDailyBonus': json['isGotDailyBonus'],
     };
 }
 
-export function UserDetailVOToJSON(value?: UserDetailVO | null): any {
+export function MyUserDetailVOToJSON(value?: MyUserDetailVO | null): any {
     if (value === undefined) {
         return undefined;
     }
@@ -158,8 +166,9 @@ export function UserDetailVOToJSON(value?: UserDetailVO | null): any {
         'bannerUrl': value.bannerUrl,
         'fans': value.fans,
         'subscribes': value.subscribes,
-        'followers': value.followers,
         'coins': value.coins,
+        'followers': value.followers,
+        'isGotDailyBonus': value.isGotDailyBonus,
     };
 }
 

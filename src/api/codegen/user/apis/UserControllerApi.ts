@@ -16,7 +16,7 @@
 import * as runtime from '../runtime';
 import type {
   EmailLoginDTO,
-  ResponseDailyBonusVO,
+  ResponseMyUserDetailVO,
   ResponseObject,
   ResponseUserDetailVO,
   SendLoginEmailCodeDTO,
@@ -25,8 +25,8 @@ import type {
 import {
     EmailLoginDTOFromJSON,
     EmailLoginDTOToJSON,
-    ResponseDailyBonusVOFromJSON,
-    ResponseDailyBonusVOToJSON,
+    ResponseMyUserDetailVOFromJSON,
+    ResponseMyUserDetailVOToJSON,
     ResponseObjectFromJSON,
     ResponseObjectToJSON,
     ResponseUserDetailVOFromJSON,
@@ -57,32 +57,6 @@ export interface UpdateUserDetailRequest {
  * 
  */
 export class UserControllerApi extends runtime.BaseAPI {
-
-    /**
-     * 尝试获取当日奖励
-     */
-    async checkDailyBonusRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseDailyBonusVO>> {
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        const response = await this.request({
-            path: `/api/v1/user/checkDailyBonus`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseDailyBonusVOFromJSON(jsonValue));
-    }
-
-    /**
-     * 尝试获取当日奖励
-     */
-    async checkDailyBonus(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseDailyBonusVO> {
-        const response = await this.checkDailyBonusRaw(initOverrides);
-        return await response.value();
-    }
 
     /**
      * 查询用户资料
@@ -156,7 +130,7 @@ export class UserControllerApi extends runtime.BaseAPI {
     /**
      * 查询当前用户的个人资料
      */
-    async myUserDetailRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseUserDetailVO>> {
+    async myUserDetailRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseMyUserDetailVO>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -168,13 +142,13 @@ export class UserControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseUserDetailVOFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseMyUserDetailVOFromJSON(jsonValue));
     }
 
     /**
      * 查询当前用户的个人资料
      */
-    async myUserDetail(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseUserDetailVO> {
+    async myUserDetail(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseMyUserDetailVO> {
         const response = await this.myUserDetailRaw(initOverrides);
         return await response.value();
     }

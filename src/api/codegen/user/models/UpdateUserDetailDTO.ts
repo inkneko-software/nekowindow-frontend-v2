@@ -21,12 +21,6 @@ import { exists, mapValues } from '../runtime';
 export interface UpdateUserDetailDTO {
     /**
      * 
-     * @type {number}
-     * @memberof UpdateUserDetailDTO
-     */
-    uid: number;
-    /**
-     * 
      * @type {string}
      * @memberof UpdateUserDetailDTO
      */
@@ -68,7 +62,6 @@ export interface UpdateUserDetailDTO {
  */
 export function instanceOfUpdateUserDetailDTO(value: object): boolean {
     let isInstance = true;
-    isInstance = isInstance && "uid" in value;
 
     return isInstance;
 }
@@ -83,7 +76,6 @@ export function UpdateUserDetailDTOFromJSONTyped(json: any, ignoreDiscriminator:
     }
     return {
         
-        'uid': json['uid'],
         'username': !exists(json, 'username') ? undefined : json['username'],
         'sign': !exists(json, 'sign') ? undefined : json['sign'],
         'gender': !exists(json, 'gender') ? undefined : json['gender'],
@@ -102,7 +94,6 @@ export function UpdateUserDetailDTOToJSON(value?: UpdateUserDetailDTO | null): a
     }
     return {
         
-        'uid': value.uid,
         'username': value.username,
         'sign': value.sign,
         'gender': value.gender,
