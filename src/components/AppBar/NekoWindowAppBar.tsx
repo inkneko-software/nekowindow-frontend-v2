@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+'use client'
+import { useState, useEffect, useRef, useContext } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -33,11 +34,11 @@ import theme from '@theme/theme';
 import { Configuration, UserControllerApi, UserDetailVO } from '@api/codegen/user';
 import LoginDialog from '@components/LoginDialog/LoginDialog';
 
-const userapi = new UserControllerApi(new Configuration({ credentials: 'include' }))
 
 interface INavigationButton {
     text: string,
     icon: React.ReactNode,
+    href: string,
     badgeContent?: number,
     children?: React.ReactNode,
 }
@@ -58,7 +59,7 @@ function NavigationButton(props: INavigationButton) {
                         color: theme.palette.primary.main
                     }
                 }}
-                href='/message/my'
+                href={props.href}
                 target='_blank'
                 size='large'
                 color='inherit'
@@ -92,6 +93,8 @@ interface INekoWindowAppBar {
 }
 
 const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
+    const userapi = new UserControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }))
+
     const theme = useTheme();
     const [loginDialogOpen, setLoginDialogOpen] = useState(false);
     const [userInfo, setUserInfo] = useState<UserDetailVO | null>();
@@ -151,11 +154,11 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                             </Button>
                         }
                         {
-                            userInfo !== undefined && userInfo !== null && <NavigationButton text='' icon={<Avatar src={userInfo?.avatarUrl} />}>
+                            userInfo !== undefined && userInfo !== null && <NavigationButton text='' icon={<Avatar src={userInfo?.avatarUrl} />} href={`/space/${userInfo.uid}`}>
                                 <Paper sx={{ padding: 3, display: 'flex', flexDirection: 'column' }}>
                                     <Avatar sx={{ margin: '12px auto' }} src={userInfo?.avatarUrl} />
                                     <Typography sx={{ margin: '6px auto' }} variant='body2' >{userInfo?.username}</Typography>
-                                    <Typography sx={{ margin: '6px auto' }} variant='caption'>{`硬币: ${0} 经验: ${userInfo?.exp}`}</Typography>
+                                    <Typography sx={{ margin: '6px auto' }} variant='caption'>{`硬币: ${userInfo.coins} 经验: ${userInfo?.exp}`}</Typography>
                                     <Stack direction='row' sx={{ width: '100%', paddingLeft: 2, paddingRight: 2 }}>
                                         <Button sx={{ width: '100%', color: 'black', '&:hover': { color: '#2196f3' } }} >
                                             {userInfo?.fans}<br />{'粉丝'}
@@ -198,7 +201,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                             </NavigationButton>
                         }
                         {/* 消息 */}
-                        <NavigationButton text='消息' icon={<MailOutlineOutlinedIcon />}>
+                        <NavigationButton text='消息' icon={<MailOutlineOutlinedIcon />} href="/message/my">
                             <Paper sx={{ padding: 3 }}>
                                 <Stack direction={'column'} >
                                     <Button href='/message/my'>我的消息</Button>
@@ -210,7 +213,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                         </NavigationButton>
 
                         {/* 动态 */}
-                        <NavigationButton text='动态' icon={<SailingOutlinedIcon />}>
+                        <NavigationButton text='动态' icon={<SailingOutlinedIcon />} href="/activity">
                             <Paper sx={{ padding: 3 }}>
                                 <Stack direction={'column'} >
                                     <Button href='/message/my'>我的消息</Button>
@@ -221,7 +224,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                             </Paper>
                         </NavigationButton>
                         {/* 收藏 */}
-                        <NavigationButton text='收藏' icon={<StarBorderRoundedIcon />}>
+                        <NavigationButton text='收藏' icon={<StarBorderRoundedIcon />} href={userInfo ? `${userInfo.uid}` : ""} >
                             <Paper sx={{ padding: 3 }}>
                                 <Stack direction={'column'} >
                                     <Button href='/message/my'>我的消息</Button>
@@ -232,7 +235,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
                             </Paper>
                         </NavigationButton>
                         {/* 历史 */}
-                        <NavigationButton text='历史' icon={<RestoreOutlinedIcon />}>
+                        <NavigationButton text='历史' icon={<RestoreOutlinedIcon />} href="/history">
                             <Paper sx={{ padding: 3 }}>
                                 <Stack direction={'column'} >
                                     <Button href='/message/my'>我的消息</Button>
