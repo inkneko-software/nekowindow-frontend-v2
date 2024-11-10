@@ -8,7 +8,6 @@ import ReplyRoundedIcon from '@mui/icons-material/ReplyRounded';
 import CommentPanel from '@components/Comment/CommentPanel';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import NekoPlayer from '@components/Media/NekoPlayer';
 import DanmakuPanel from '@components/Danmaku/DanmakuPanel';
 import RecommendPannel from '@components/Recommend/RecommendPanel';
 import CoinIcon from '@components/Icons/CoinIcon';
@@ -20,9 +19,8 @@ import Head from 'next/head';
 import DefaultErrorPage from 'next/error'
 import { useRouter } from 'next/navigation';
 import NepPlayer, { CustomDanmakuEvent } from '@components/NepPlayer/NepPlayer';
-import { Configuration, VideoControllerApi } from '@api/codegen/video';
+import { Configuration, UploadUserVO, VideoControllerApi } from '@api/codegen/video';
 
-const videoapi = new VideoControllerApi(new Configuration({credentials: 'include', basePath: process.env.basePath}));
 
 const SocialSection = styled('div')(({ theme }) => ({
   marginTop: "5px",
@@ -32,6 +30,8 @@ const SocialSection = styled('div')(({ theme }) => ({
 }));
 
 export default function VideoPage({ params }: { params: { nkid: number } }) {
+  const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+
   const theme = useTheme();
   const router = useRouter();
 
@@ -53,11 +53,12 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
     dash_mpd_path: ''
   })
 
-  const [uploader, setUploader] = React.useState({
-    uid: 0,
-    nick: "用户加载中",
+  const [uploader, setUploader] = React.useState<UploadUserVO>({
+    userId: 0,
+    username: "用户加载中",
     sign: "",
-    face_url: "",
+    avatarUrl: "",
+    fans: 0
   })
 
   const [danmaku, setDanmaku] = React.useState("");
@@ -67,6 +68,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
       if (res.data) {
         var shit = res.data.videos[0].dashMpdUrl as string;
         console.log(shit)
+        setUploader(res.data.uploader)
         setPost({ ...post, title: res.data.title as string, tags: res.data.tags as string[], dash_mpd_path: shit, description: res.data.description as string });
       }
     })
@@ -75,10 +77,10 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
   const handleSendDanmaku = () => {
     var danmakuInput = document.getElementById("danmaku-input") as HTMLInputElement;
     var danmaku = danmakuInput.value
-    if (danmaku.trim() === ''){
+    if (danmaku.trim() === '') {
       return;
     }
-    
+
     var event = new CustomEvent<CustomDanmakuEvent>("danmaku::insert", {
       detail: {
         content: danmaku
@@ -207,12 +209,12 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
         <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 2, width: '420px' }}>
           {/* up主信息 */}
           <Box sx={{ margin: "16px 0px", display: "flex", flexDirection: "row", height: "64px" }}>
-            <Avatar src={uploader.face_url} />
+            <Avatar src={uploader.avatarUrl} />
             <Box sx={{ marginLeft: "8px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-              <Typography sx={{ fontSize: "0.9rem" }} variant="h6" component="div" style={{ color: uploadColor }}>
-                {uploader.nick}
+              <Typography sx={{ fontSize: "0.9em" }} variant="h6" component="div" style={{ color: uploadColor }}>
+                {uploader.username}
               </Typography>
-              <Typography sx={{ fontSize: "0.5rem", color: "gray" }} variant="body2" component="div">
+              <Typography sx={{ fontSize: "0.5em", color: "gray" }} variant="body2" component="div">
                 {uploader.sign}
               </Typography>
             </Box>
