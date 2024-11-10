@@ -11,73 +11,65 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 // If you are using date-fns v3.x or v4.x, please import the v3 adapter
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3'
 import TextField from '@mui/material/TextField';
-import {zhCN} from 'date-fns/locale/zh-CN';
+import { zhCN } from 'date-fns/locale/zh-CN';
+import { Configuration, UserControllerApi } from '@api/codegen/user';
+import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 
 
 export default function AccountMyInfo() {
 
-    const [timeValue, setTimeValue] = React.useState<Date|null>(new Date('2014-08-18T21:11:54'));
+    const userAPI = new UserControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+
     const [info, setInfo] = React.useState({
         uid: 0,
-        nick: "",
+        username: "",
         sign: "",
         exp: 0,
         gender: "",
-        face_url: "",
-        birth: ""
+        avatarUrl: "",
+        birth: new Date()
     })
-    const [updatedInfo, setUpdatedInfo] = React.useState(info)
 
+    React.useEffect(() => {
+        const fetchData = async () => {
+            let res = await userAPI.myUserDetail();
+            let myUserInfo = res.data;
+            if (myUserInfo !== undefined) {
+                setInfo({
+                    uid: myUserInfo.uid,
+                    username: myUserInfo.username,
+                    sign: myUserInfo.sign,
+                    exp: myUserInfo.exp,
+                    gender: myUserInfo.gender,
+                    avatarUrl: myUserInfo.avatarUrl,
+                    birth: myUserInfo.birth
+                })
+            }
+        }
 
-    // React.useEffect(() => {
-    //     member.GetUser(null)
-    //         .then(res => res.data)
-    //         .then(res => {
-    //             if (res.code !== 0) {
-    //                 window.location.href = "/"
-    //             }
-
-    //             var getuserdto: member.GetUserDTO = res.data
-    //             setInfo(getuserdto)
-    //             setUpdatedInfo(getuserdto)
-    //             setTimeValue(new Date(getuserdto.birth))
-    //             console.log(timeValue, getuserdto)
-    //         })
-    // }, [])
-
-
+        fetchData();
+    }, [])
 
     const handleChange = (newValue: Date | null) => {
-        setTimeValue(newValue);
-        // setUpdatedInfo((prev) => { return { ...prev, birth: `${newValue.getFullYear()}-${(newValue.getMonth() + 1).toString().padStart(2, "0")}-${newValue.getDate().toString().padStart(2, "0")}`}})
+        if (newValue !== null) {
+            setInfo(prev => ({ ...prev, birth: newValue }))
+        }
     };
 
-    const onSaveClicked = () => {
-        // var dto: member.UpdateMemberInfoDTO
-        // console.log(info, updatedInfo)
-        // if (info.birth !== updatedInfo.birth) {
-        //     dto = {...dto, birth: updatedInfo.birth}
-        // }
-        // if (info.nick !== updatedInfo.nick) {
-        //     dto = {...dto, nick: updatedInfo.nick}
-        // }
-        // if (info.sign !== updatedInfo.sign) {
-        //     dto = {...dto, sign: updatedInfo.sign}
-        // }
-        // if (info.gender !== updatedInfo.gender) {
-        //     dto = {...dto, gender: updatedInfo.gender}
-        // }
-        // member.UpdateMemberInfo(dto)
-        // .then(res=>res.data)
-        // .then(res=>{
-        //     if (res.code !== 0){
-        //         makeToast(`${res.reason} - ${res.message}`, "error")
-        //         return;
-        //     }
-        //     setInfo(updatedInfo)
-        //     makeToast("保存成功")
+    const onSaveClicked = async () => {
 
-        // })
+        let res = await userAPI.updateUserDetail({
+            updateUserDetailDTO: {
+                ...info
+            }
+        });
+
+        if (res.code === 0) {
+            enqueueSnackbar(res.message, { variant: 'success' })
+        } else {
+            enqueueSnackbar(res.message, { variant: 'error' })
+
+        }
     }
 
     return (
@@ -90,15 +82,15 @@ export default function AccountMyInfo() {
             </Box>
             <Box sx={{ display: "flex", marginBottom: 3 }}>
                 <Typography sx={{ width: "100px", textAlign: "left" }}>昵称：</Typography>
-                <OutlinedInput placeholder='请输入昵称' sx={{ height: "28px" }} value={updatedInfo.nick} onChange={(event) => { setUpdatedInfo((prev) => { return { ...prev, nick: event.target.value } }) }} />
+                <OutlinedInput placeholder='请输入昵称' sx={{ height: "28px" }} value={info.username} onChange={(event) => { setInfo((prev) => { return { ...prev, username: event.target.value } }) }} />
             </Box>
             <Box sx={{ display: "flex", marginBottom: 3 }}>
                 <Typography sx={{ width: "100px", textAlign: "left" }}>个人说明：</Typography>
-                <OutlinedInput placeholder='请输入个人说明' sx={{ height: "28px", flexGrow: 1 }} value={updatedInfo.sign} onChange={(event) => { setUpdatedInfo((prev) => { return { ...prev, sign: event.target.value } }) }} />
+                <OutlinedInput placeholder='请输入个人说明' sx={{ height: "28px", flexGrow: 1 }} value={info.sign} onChange={(event) => { setInfo((prev) => { return { ...prev, sign: event.target.value } }) }} />
             </Box>
             <Box sx={{ display: "flex", marginBottom: 3 }}>
                 <Typography sx={{ width: "100px", textAlign: "left" }}>性别：</Typography>
-                <RadioGroup row value={info.gender}  >
+                <RadioGroup row value={info.gender} onChange={e => setInfo(prev => ({ ...prev, gender: e.target.value }))} >
                     <FormControlLabel value="男" control={<Radio size="small" />} label="男" />
                     <FormControlLabel value="女" control={<Radio size="small" />} label="女" />
                     <FormControlLabel value="保密" control={<Radio size="small" />} label="保密" />
@@ -108,7 +100,7 @@ export default function AccountMyInfo() {
                 <Typography sx={{ width: "100px", textAlign: "left" }}>生日：</Typography>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DesktopDatePicker
-                        value={timeValue}
+                        value={info.birth}
                         onChange={handleChange}
                     />
                 </LocalizationProvider>
