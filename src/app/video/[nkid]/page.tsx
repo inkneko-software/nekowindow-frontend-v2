@@ -47,7 +47,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
     coin: 0,
     collection: 0,
     comment: 0,
-    created_at: 0,
+    created_at: new Date(0),
     tags: ['123'],
     partition: "",
     dash_mpd_path: ''
@@ -69,7 +69,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
         var shit = res.data.videos[0].dashMpdUrl as string;
         console.log(shit)
         setUploader(res.data.uploader)
-        setPost({ ...post, title: res.data.title as string, tags: res.data.tags as string[], dash_mpd_path: shit, description: res.data.description as string });
+        setPost({ ...post, title: res.data.title as string, tags: res.data.tags as string[], dash_mpd_path: shit, description: res.data.description as string, created_at: res.data.createdAt });
       }
     })
   }, [])
@@ -150,7 +150,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
             </Typography>
             {/* 视频详细信息 */}
             <Typography sx={{ color: "gray", margin: '8px 0px' }} variant='body2' component="div">
-              {`${post.visit}播放 · 总弹幕数${post.danmaku}`} &nbsp; &nbsp;{`${new Date(post.created_at * 1000).toLocaleString()}`}
+              {`${post.visit}播放 · 总弹幕数${post.danmaku}`} &nbsp; &nbsp;{`${post.created_at.toLocaleString()}`}
             </Typography>
           </Box>
           {/* 播放器 */}
