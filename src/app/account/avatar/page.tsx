@@ -6,76 +6,73 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import { Button, Checkbox, Chip, Divider, FormControlLabel } from '@mui/material';
 import Link from 'next/link';
+import { UserControllerApi, Configuration } from '@api/codegen/user';
+import { redirect } from 'next/navigation';
+import { enqueueSnackbar } from 'notistack';
 
 export default function AccountAvatar() {
-    const [info, setInfo] = React.useState({ uid: 0, face_url: "", nick: "", exp: 0 })
-    const faceInputRef = React.useRef(null)
-    // React.useEffect(() => {
-    //     member.GetUser(null)
-    //         .then(res => res.data)
-    //         .then(res => {
-    //             if (res.code !== 0) {
-    //                 window.location.href = "/"
-    //             }
+    const userAPI = new UserControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
 
-    //             var getuserdto: member.GetUserDTO = res.data
-    //             setInfo({
-    //                 uid: getuserdto.uid,
-    //                 face_url: getuserdto.face_url,
-    //                 nick: getuserdto.nick,
-    //                 exp: getuserdto.exp
-    //             })
-    //         })
-    // }, [])
+    const [info, setInfo] = React.useState({ uid: 0, avatarUrl: "", username: "" })
+    React.useEffect(() => {
+        const fetchData = async () => {
+            const resp = await userAPI.myUserDetail();
+            if (resp.code !== 0 || resp.data === undefined) {
+                redirect("/error?reason=please_login_first");
+            }
 
-    const uploadFaceClicked = ()=>{
-        // var faceInput: HTMLInputElement = faceInputRef.current
-        // faceInput.onchange = ()=>{
-        //     var file: File = faceInput.files[0]
-        //     filesystemAPI.uploadFace(file)
-        //     .then(res=>res.data)
-        //     .then(res=>{
-        //         if (res.code !== 0){
-        //             makeToast(`${res.reason} - ${res.message}`, "error")
-        //             return;
-        //         }
-        //         var resp: filesystemAPI.UploadFaceResponse = res.data;
-        //         setInfo((prev)=>{return {...prev, face_url:resp.host + resp.path}})
-        //         console.log(resp)
+            setInfo({
+                uid: resp.data.uid,
+                avatarUrl: resp.data.avatarUrl,
+                username: resp.data.username
+            })
+        }
 
-        //         memberAPI.UpdateFace(resp.host + resp.path, resp.face_pid)
-        //         .then(res=>res.data)
-        //         .then(res=>{
-        //             if (res.code !== 0){
-        //                 makeToast(`${res.reason} - ${res.message}`, "error")
-        //             }
-        //             makeToast("上传成功")
-        //             setInterval(()=>{window.location.reload()}, 1000)
-        //         })
-        //         .catch(err=>{
-        //             makeToast("更新失败")
-        //         })
+        fetchData();
+    }, [])
 
+    const uploadFaceClicked = async () => {
+        var faceInput: HTMLInputElement = document.getElementById('avatar-select-input') as HTMLInputElement;
 
-        //     })
-        //     .catch(err=>{
-        //         makeToast("更新失败")
-        //     })
-        // }
+        faceInput.onchange = async () => {
+            if (faceInput.files === null || faceInput.files.length === 0) {
+                return;
+            }
 
-        // faceInputRef.current.click()
+            var resp = await userAPI.generateAvatarUploadURL();
+            if (resp.code !== 0 || resp.data === undefined) {
+                enqueueSnackbar<'error'>("获取头像上传链接失败：" + resp.message, { anchorOrigin: { horizontal: 'center', vertical: 'bottom' } });
+                faceInput.files = null;
+                return;
+            }
+
+            var file: File = faceInput.files[0]
+            fetch(resp.data, { method: 'put', body: file })
+
+            var updateResp = await userAPI.updateUserDetail({ updateUserDetailDTO: { avatarUrl: resp.data.split('?')[0] } });
+            if (updateResp.code !== 0) {
+                enqueueSnackbar<'error'>("更新头像失败：" + updateResp.message, { anchorOrigin: { horizontal: 'center', vertical: 'bottom' } });
+                faceInput.files = null;
+                return;
+            }
+
+            enqueueSnackbar<'success'>("上传成功", { anchorOrigin: { horizontal: 'center', vertical: 'bottom' } })
+            setInfo({ ...info, avatarUrl: resp.data.split('?')[0] })
+        }
+
+        faceInput.click()
     }
 
     return (
         <Box  >
             <form>
-                <input ref={faceInputRef} type="file" hidden={true} accept=".jpeg,.jpg,.png,.gif" multiple={false} />
+                <input id="avatar-select-input" type="file" hidden={true} accept=".jpeg,.jpg,.png,.gif" multiple={false} />
             </form>
             <Typography>头像设置</Typography>
             <Divider sx={{ marginTop: 3, marginBottom: 3 }} />
-            <Box sx={{ display: "flex", flexDirection:"column", marginBottom: 3}}>
-                <Avatar sx={{margin:"0px auto", width:"100px", height:"100px", border:"1px solid #e3e3e3"}} src={info.face_url}  />
-                <Button sx={{width:"100px", margin:"24px auto"}} variant="contained" onClick={uploadFaceClicked}>点击上传</Button>
+            <Box sx={{ display: "flex", flexDirection: "column", marginBottom: 3 }}>
+                <Avatar sx={{ margin: "0px auto", width: "100px", height: "100px", border: "1px solid #e3e3e3" }} src={info.avatarUrl} />
+                <Button sx={{ width: "100px", margin: "24px auto" }} variant="contained" onClick={uploadFaceClicked}>点击上传</Button>
             </Box>
 
             <Divider sx={{ marginTop: 3, marginBottom: 3 }} />
