@@ -26,20 +26,29 @@ import { Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
 import { UploadDialog } from './UploadDialog';
 
 import { Configuration, PartitionInfo, UserUploadedVideoStatisticsVO, VideoControllerApi, VideoManagementControllerApi, VideoPostBriefVO } from '@api/codegen/video';
+import { useSearchParams } from 'next/navigation';
 
-var videoAPI = new VideoControllerApi(new Configuration({ credentials: "include", basePath: process.env.basePath }))
 
-var videoManagementAPI = new VideoManagementControllerApi(new Configuration({ credentials: "include", basePath: process.env.basePath  }))
 
 const UploadHome: React.FC = () => {
-  const [uploadDialogOpen, setUploadDialogOpen] = React.useState(true)
+  const videoAPI = new VideoControllerApi(new Configuration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
+  const videoManagementAPI = new VideoManagementControllerApi(new Configuration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
+
+  const [uploadDialogOpen, setUploadDialogOpen] = React.useState(false)
   const [tabIndex, setTabIndex] = React.useState(0)
   const [uploadedVideos, setUploadedVideos] = React.useState<UserUploadedVideoStatisticsVO[]>([]);
 
+  const searchParams = useSearchParams();
+  const requestUpload = searchParams.get("requestUpload");
   React.useEffect(() => {
     videoManagementAPI.getUploadedVideos().then(res => {
       setUploadedVideos(res.data as UserUploadedVideoStatisticsVO[])
     })
+    
+    //通过该参数控制是否默认打开上传框
+    if (requestUpload == "1"){
+      setUploadDialogOpen(true);
+    }
   }, [])
 
   return (
