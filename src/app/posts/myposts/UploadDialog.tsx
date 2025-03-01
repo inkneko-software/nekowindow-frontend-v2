@@ -27,13 +27,14 @@ import { Configuration, PartitionInfo, VideoControllerApi } from '@api/codegen/v
 import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 import { useRouter } from 'next/navigation'
 
-const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include', basePath: process.env.basePath  }));
 interface UploadDialogProps {
   open: boolean,
   onClose: () => void
 }
 
 export const UploadDialog: React.FC<UploadDialogProps> = ({ open, onClose }) => {
+  const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+
   const steps = [
     '视频信息',
     '内容审核',
