@@ -22,7 +22,7 @@ export interface AdaptionSwitchPanelProps {
     adaptionId: number,
   }[],
   currentAdaptionId: number,
-  onAdaptionSwitched: (adaption: string) => void,
+  onAdaptionSwitched: (adaptionId: number) => void,
   onOpenStateChange: (open: boolean) => void
 }
 
@@ -92,25 +92,39 @@ export default function AdaptionSwitchPanel(props: AdaptionSwitchPanelProps) {
               {
                 props.adaptions.map((adaption, index) => {
                   return (
-                  <Button
-                    key={index}
-                    sx={[{
-                    color: "white",
-                    width: "130px",
-                    ":hover": { bgcolor: "rgba(255,255,255,0.3)" }
-                    },
-                    props.currentAdaptionId === adaption.adaptionId && { color: "rgba(59, 130, 236)" }]}
-                  >
-                    {adaption.adaptionName}
-                  </Button>
+                    <Button
+                      key={index}
+                      sx={[{
+                        color: "white",
+                        width: "130px",
+                        ":hover": { bgcolor: "rgba(255,255,255,0.3)" }
+                      },
+                      props.currentAdaptionId === adaption.adaptionId && { color: "rgba(59, 130, 236)" }]}
+                      onClick={() => {
+                        props.onAdaptionSwitched(adaption.adaptionId)
+                      }}
+                    >
+                      {adaption.adaptionName}
+                    </Button>
                   )
                 })
               }
-              <Button sx={{ color: "white", width: "130px", ":hover": { bgcolor: "rgba(255,255,255,0.3)" } }}>自动</Button>
+              <Button
+                sx={[
+                  { color: "white", width: "130px", ":hover": { bgcolor: "rgba(255,255,255,0.3)" } },
+                  props.currentAdaptionId === 0 && { color: "rgba(59, 130, 236)" }
+                ]}
+                onClick={() => {
+                  props.onAdaptionSwitched(0)
+                }}
+              >
+                自动
+              </Button>
             </Stack>
           </Paper>
         </Fade>
-      )}
-    </Popper>
+      )
+      }
+    </Popper >
   )
 }

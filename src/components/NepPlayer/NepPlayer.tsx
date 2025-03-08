@@ -14,6 +14,7 @@ import VolumePanel from "./VolumePanel"
 import ProgressBar from "./ProgressBar"
 import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
 import MetricsPanel from "./MetricsPanel"
+import { MediaPlayer } from "dashjs"
 
 interface NepPlayerProps {
   src: string
@@ -75,7 +76,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
   const [danmakuEngine, setDanmakuEngine] = React.useState<NekoDanmakuEngine>();
 
   //当前播放的清晰度ID
-  const [currentAdaptionId, setCurrentAdaptionId] = React.useState(adaptions[0].adaptionId);
+  const [currentAdaptionId, setCurrentAdaptionId] = React.useState(0);
 
   //右键菜单信息
   const [contextMenu, setContextMenu] = React.useState<{ mouseX: number, mouseY: number } | null>(null);
@@ -99,6 +100,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
   //     setVideoTime(`${spentMinutes}:${spentSeconds} / ${durationMinutes}:${durationSeconds}`);
   // }, [props.duration, props.currentTime])
+
+  const [dashPlayer, setDashPlayer] = React.useState<any>(null);
 
   React.useEffect(() => {
     //获取video标签
@@ -155,9 +158,9 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
     //dash播放器初始化
     (async () => {
-      const { MediaPlayer } = await import('dashjs')
-      let dashPlayer = MediaPlayer().create();
-      dashPlayer.initialize(videoRef.current, src, true);
+      var dashMediaPlayer = MediaPlayer().create();
+      dashMediaPlayer.initialize(videoRef.current, src, true);
+      setDashPlayer(dashMediaPlayer);
       //事件注册
       // player.on(MediaPlayer.events["MANIFEST_LOADED"],onManifestLoaded);
 
@@ -170,7 +173,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
       var handle = setInterval(() => {
         /* 计算网络连接速度 与 网络下载量*/
         //anyscript ...
-        var dashMetrics = dashPlayer.getDashMetrics()
+        var dashMetrics = dashMediaPlayer.getDashMetrics()
 
         var httpMetrics = dashMetrics.getHttpRequests("video");
         var thisUpdate: any[] = httpMetrics.slice(lastLength)
@@ -184,8 +187,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
         var bufferLevel = dashMetrics.getCurrentBufferLevel('video');
 
 
-        var streamInfo: any = dashPlayer.getActiveStream();
-        var dashAdapter: any = dashPlayer.getDashAdapter();
+        var streamInfo: any = dashMediaPlayer.getActiveStream();
+        var dashAdapter: any = dashMediaPlayer.getDashAdapter();
 
         if (dashMetrics && streamInfo) {
           streamInfo = streamInfo.getStreamInfo()
@@ -208,8 +211,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
           if (splitedFrameRate.length == 2) {
             frameRate = (splitedFrameRate[0] / splitedFrameRate[1]).toFixed(2)
           }
-          var videoTrack = dashPlayer.getCurrentTrackFor("video");
-          var audioTrack = dashPlayer.getCurrentTrackFor("audio");
+          var videoTrack = dashMediaPlayer.getCurrentTrackFor("video");
+          var audioTrack = dashMediaPlayer.getCurrentTrackFor("audio");
 
           setPlayerMatrics({
             codec: `${videoTrack ? videoTrack.codec : ''};${audioTrack ? audioTrack.codec : ''};`,
@@ -223,8 +226,10 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
         }
       }, 1000)
+
     })();
 
+    
 
     var playerWrap = document.getElementById("nep-player-wrap") as HTMLDivElement;
 
@@ -391,6 +396,41 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
     }
   }
 
+  const handleAdaptionChange = (adaptionId: number) => {
+    console.log("更换清晰度", adaptionId)
+    //默认配置为自动选择视频码率
+    var cfg = {
+      'streaming': {
+        'abr': {
+          'autoSwitchBitrate': {
+            video: true
+          }
+        }
+      }
+    };
+    if (adaptionId === 0) {
+      dashPlayer.updateSettings(cfg);
+      dashPlayer.setAutoSwitchEnabledFor('video', false);
+      setCurrentAdaptionId(adaptionId);
+      return;
+    }
+    //首先获取当前清晰度对应的index，由于0是最低的码率，所以需要取反
+    var selectedAdaptionIndex = adaptions.findIndex((item) => item.adaptionId === adaptionId);
+    if (selectedAdaptionIndex === undefined) {
+      throw new Error("Invalid adaption id");
+    }
+    selectedAdaptionIndex = adaptions.length - selectedAdaptionIndex - 1;
+
+    //https://cdn.dashjs.org/v4.7.4/jsdoc/module-MediaPlayer.html#setQualityFor
+    //切换清晰度需要关闭ABR的自动码率切换
+    cfg.streaming.abr.autoSwitchBitrate['video'] = false;
+    dashPlayer.updateSettings(cfg);
+    dashPlayer.setQualityFor("video", selectedAdaptionIndex, false);
+    setCurrentAdaptionId(adaptionId);
+    // cfg.streaming.abr.autoSwitchBitrate[item.mediaType] = true;
+    // self.player.updateSettings(cfg);
+  }
+
   return (
     <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
       {/* video标签 */}
@@ -437,7 +477,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
           {/* 清晰度选项按钮 */}
           <Button disableRipple sx={sxCommonButton} ref={adaptionButtonRef} onMouseEnter={() => setAdaptionSwitchPanelOpen(true)} onMouseLeave={() => setAdaptionSwitchPanelOpen(false)}>1080P</Button>
           {/* 清晰度选择面板 */}
-          <AdaptionSwitchPanel open={adaptionSwitchPanelOpen} anchorEl={adaptionButtonRef.current} adaptions={adaptions} currentAdaptionId={currentAdaptionId} onOpenStateChange={setAdaptionSwitchPanelOpen} onAdaptionSwitched={() => { }} />
+          <AdaptionSwitchPanel open={adaptionSwitchPanelOpen} anchorEl={adaptionButtonRef.current} adaptions={adaptions} currentAdaptionId={currentAdaptionId} onOpenStateChange={setAdaptionSwitchPanelOpen} onAdaptionSwitched={handleAdaptionChange} />
           {/* 播放速度按钮 */}
           <Button disableRipple sx={sxCommonButton} ref={speedRateSwitchPanelRef} onMouseEnter={() => setSpeedRateSwitchPanelOpen(true)} onMouseLeave={() => setSpeedRateSwitchPanelOpen(false)} >倍速</Button>
           {/* 倍速按钮 */}
