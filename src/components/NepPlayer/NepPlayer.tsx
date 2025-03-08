@@ -52,6 +52,8 @@ export interface IVideoPlayBackRateEvnet {
   speedRate: string
 }
 
+export type FullscreenType = "normal" | "browser" | "window"
+
 const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
   const [paused, setPaused] = React.useState(true);
   const [currentTime, setCurrentTime] = React.useState(0);
@@ -77,6 +79,9 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
   //当前播放的清晰度ID
   const [currentAdaptionId, setCurrentAdaptionId] = React.useState(0);
+
+  //全屏状态
+  const [fullscreen, setFullscreen] = React.useState<FullscreenType>("normal")
 
   //右键菜单信息
   const [contextMenu, setContextMenu] = React.useState<{ mouseX: number, mouseY: number } | null>(null);
@@ -229,7 +234,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
     })();
 
-    
+
 
     var playerWrap = document.getElementById("nep-player-wrap") as HTMLDivElement;
 
@@ -359,12 +364,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
   const videoClick = () => {
   }
 
-  const browserFullscreenClicked = () => {
-
-  }
-
-  const windowFullscreenClicked = () => {
-  }
 
   const [adaptionSwitchPanelOpen, setAdaptionSwitchPanelOpen] = React.useState(false)
   const adaptionButtonRef = React.useRef(null)
@@ -431,8 +430,68 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
     // self.player.updateSettings(cfg);
   }
 
+  const onFullscreenChange = (newType: FullscreenType) => {
+    // engine.oncontainerchange()
+    if (newType !== "normal") {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+
+    if (newType === "window") {
+      var playerWrap = document.getElementById("nep-player-wrap") as HTMLDivElement;
+      if (playerWrap !== null) {
+        playerWrap.requestFullscreen();
+      }
+
+    }
+
+    if (newType === "normal" && fullscreen === 'window') {
+      document.exitFullscreen();
+    }
+    setFullscreen(newType)
+  }
+
+  const browserFullscreenClicked = () => {
+
+    onFullscreenChange(fullscreen === "browser" ? "normal" : "browser")
+  }
+
+  const windowFullscreenClicked = () => {
+    onFullscreenChange(fullscreen === "window" ? "normal" : "window")
+  }
+  const sxTitleHidden = {
+    display: "none"
+  }
+
+  const sxTitleShow = {
+    color: "#ffffff",
+    width: "100%",
+    padding: "10px",
+    position: "absolute",
+    backgroundImage: "linear-gradient(180deg,rgba(0,0,0,0.8) 9%,rgba(0,0,0,0.0) 100%)"
+  }
+
+  const sxPlayerScreen = {
+    width: '100%',
+    height: '100%'
+  }
+  
+  const sxBrowserFullscreen = {
+    position: "fixed",
+    left: 0,
+    top: 0,
+    zIndex: 11000,
+    width: "100%",
+    height: "100% !important"
+  }
+  
+  const sxWindowFullscreen = {
+  
+  }
+
   return (
-    <Box id='nep-player-wrap' sx={{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }} >
+    <Box id='nep-player-wrap' sx={[{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }, (fullscreen === "normal" ? {} : (fullscreen === "browser" ? sxBrowserFullscreen : sxWindowFullscreen))]} >
       {/* video标签 */}
       <Box component='video' id="nep-player-video" sx={{ width: '100%' }} ref={videoRef} />
       <Box id="nep-player-danmaku" sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} onClick={() => {
@@ -442,8 +501,9 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
         }
       }} />
       {/* 视频标题 */}
+
       <Box sx={{
-        display: 'none',
+        display: `${fullscreen === 'normal' ? 'none' : isBriefMode? 'none' : 'unset'}`,
         position: 'absolute',
         top: 0,
         left: 0,
@@ -452,6 +512,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
       }}>
         <Typography variant='h5' sx={{ padding: '16px 16px 32px 16px', color: 'white' }}>{title}</Typography>
       </Box>
+
       {/* 控制组件 */}
       <Box sx={{
         position: 'absolute',
