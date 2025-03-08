@@ -1,5 +1,5 @@
 'use client'
-import { Box, Fade, Paper, Popper, Slider, Stack, Typography } from "@mui/material"
+import { Box, Fade, Menu, MenuItem, Paper, Popper, Slider, Stack, Typography } from "@mui/material"
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
 import React from "react"
@@ -13,10 +13,15 @@ import SpeedRateSwitchPanel from "./SpeedRateSwitchPanel"
 import VolumePanel from "./VolumePanel"
 import ProgressBar from "./ProgressBar"
 import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
+import MetricsPanel from "./MetricsPanel"
 
 interface NepPlayerProps {
   src: string
-  title: string
+  title: string,
+  adaptions: {
+    adaptionName: string,
+    adaptionId: number,
+  }[]
 }
 
 type PlayerWindowState = 'normal' | 'browser-full' | 'screen-full';
@@ -42,8 +47,11 @@ export interface CustomDanmakuEvent {
   content: string
 }
 
-const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
-  //视频标题
+export interface IVideoPlayBackRateEvnet {
+  speedRate: string
+}
+
+const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
   const [paused, setPaused] = React.useState(true);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
@@ -51,13 +59,36 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   const [bufferedTimeRanges, setBufferedTimeRanges] = React.useState<TimeRanges>();
 
   const [windowState, setWindowState] = React.useState<PlayerWindowState>('normal')
+  //播放器统计信息面板的打开状态
+  const [playerMetricsOpen, setPlayerMetricsOpen] = React.useState(false)
+
   const [isBriefMode, setIsBriefMode] = React.useState(false);
 
+  //音量面板
   const volumeButtonRef = React.useRef(null)
   const [volumePanelOpen, setVolumePanelOpen] = React.useState(false)
 
+  //video标签引用
   const videoRef = React.useRef<HTMLVideoElement>();
+
+  //弹幕引擎
   const [danmakuEngine, setDanmakuEngine] = React.useState<NekoDanmakuEngine>();
+
+  //当前播放的清晰度ID
+  const [currentAdaptionId, setCurrentAdaptionId] = React.useState(adaptions[0].adaptionId);
+
+  //右键菜单信息
+  const [contextMenu, setContextMenu] = React.useState<{ mouseX: number, mouseY: number } | null>(null);
+
+  //播放器统计信息
+  const [playerMatrics, setPlayerMatrics] = React.useState({
+    codec: "",
+    resolution: "",
+    videoDataRate: 0,
+    audtioDataRate: 0,
+    downloadSpeed: 0,
+    buffer: 0
+  })
 
   // React.useEffect(() => {
   //     let spentMinutes = Math.floor(props.currentTime / 60).toString().padStart(2, '0')
@@ -70,16 +101,19 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
   // }, [props.duration, props.currentTime])
 
   React.useEffect(() => {
+    //获取video标签
     var video = document.getElementById("nep-player-video") as HTMLVideoElement;
     console.log(video)
     if (video === null) {
       return;
     }
 
+    //弹幕引擎初始化
     var danmakuWrap = document.getElementById("nep-player-danmaku") as HTMLElement;
     var danmakuEngine = new NekoDanmakuEngine(danmakuWrap);
     setDanmakuEngine(danmakuEngine)
 
+    //video事件监听
     video.onclick = () => {
       if (video.paused) {
         video.play();
@@ -87,14 +121,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
         video.pause();
       }
 
-    }
-
-    video.onmousemove = (event) => {
-      // document.dispatchEvent(new CustomEvent("active-player-controls", { detail: { fade: true } }))
-    }
-
-    video.onmouseleave = (event) => {
-      // setShowControls(false);
     }
 
     //video事件监听
@@ -126,18 +152,33 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       }
     }
 
-    video.src = src;
 
-    var player = document.getElementById("nep-player-wrap") as HTMLDivElement;
+    //dash播放器初始化
+    (async () => {
+      const { MediaPlayer } = await import('dashjs')
+      let dashPlayer = MediaPlayer().create();
+      dashPlayer.initialize(videoRef.current, src, true);
+      //事件注册
+      // player.on(MediaPlayer.events["MANIFEST_LOADED"],onManifestLoaded);
+
+      // dashCleanUp = ()=>{
+      //     player.off(MediaPlayer.events["MANIFEST_LOADED"],onManifestLoaded);
+      // }
+    })();
+
+
+    var playerWrap = document.getElementById("nep-player-wrap") as HTMLDivElement;
 
     var inactiveHandle: NodeJS.Timeout | number | undefined = undefined;
 
+    //页面加载后1秒后隐藏控制面板
     inactiveHandle = setTimeout(() => {
       setIsBriefMode(true);
       inactiveHandle = undefined;
     }, 1000);
 
-    player.onmousemove = (event) => {
+    //鼠标移动时显示控制面板，隐藏简略模式的进度条
+    playerWrap.onmousemove = (event) => {
       setIsBriefMode(false);
       if (inactiveHandle !== undefined) {
         clearTimeout(inactiveHandle);
@@ -148,14 +189,33 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       }, 2000);
     }
 
-    player.onmouseleave = (event) => {
+    //鼠标移出时显示简略模式的进度条
+    playerWrap.onmouseleave = (event) => {
       setIsBriefMode(true);
       if (inactiveHandle !== undefined) {
         clearTimeout(inactiveHandle);
       }
     }
 
+    //右键菜单
+    playerWrap.oncontextmenu = (event) => {
+      event.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+            mouseX: event.clientX - 2,
+            mouseY: event.clientY - 4,
+          }
+          : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+          // Other native context menus might behave different.
+          // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+          null,
+      );
+    };
+
+    //控制按钮移动时不隐藏控制面板
     var controllButtons = document.getElementById('nep-player-controll-btns') as HTMLDivElement;
+
     controllButtons.onmousemove = (event) => {
       event.stopPropagation();
       if (inactiveHandle !== undefined) {
@@ -163,6 +223,29 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       }
     }
 
+
+    //设置控制面板常显
+    const activeEventListener = () => {
+      setIsBriefMode(false);
+      if (inactiveHandle !== undefined) {
+        clearTimeout(inactiveHandle);
+      }
+    }
+
+    //隐藏控制面板
+    const dismissEventListener = () => {
+      setIsBriefMode(true);
+    }
+
+
+    //倍速切换
+    const speedRateEventListener = (e: CustomEvent<IVideoPlayBackRateEvnet>) => {
+      video.playbackRate = parseFloat(e.detail.speedRate);
+    }
+
+    document.addEventListener("active-player-controls", activeEventListener)
+    document.addEventListener("dismiss-player-controls", dismissEventListener)
+    document.addEventListener("player-switch-speedrate", speedRateEventListener as EventListener)
 
     return () => {
       video.onclick = null;
@@ -174,8 +257,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       video.onpause = null;
       document.onfullscreenchange = null;
 
-      player.onmousemove = null;
-      player.onmouseleave = null;
+      playerWrap.onmousemove = null;
+      playerWrap.onmouseleave = null;
       controllButtons.onmousemove = null;
       danmakuEngine.destory();
     }
@@ -254,6 +337,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       {/* video标签 */}
       <Box component='video' id="nep-player-video" sx={{ width: '100%' }} ref={videoRef} />
       <Box id="nep-player-danmaku" sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} onClick={() => {
+        //弹幕界面实际上是覆盖在video上的，所以点击弹幕界面实际上是点击video，需要传递点击事件
         if (videoRef.current !== undefined) {
           videoRef.current.click();
         }
@@ -294,7 +378,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
           {/* 清晰度选项按钮 */}
           <Button disableRipple sx={sxCommonButton} ref={adaptionButtonRef} onMouseEnter={() => setAdaptionSwitchPanelOpen(true)} onMouseLeave={() => setAdaptionSwitchPanelOpen(false)}>1080P</Button>
           {/* 清晰度选择面板 */}
-          <AdaptionSwitchPanel open={adaptionSwitchPanelOpen} anchorEl={adaptionButtonRef.current} adaptions={[{ adaptionName: "超清1080P60", adaptionId: 1 }, { adaptionName: "超清 1080P", adaptionId: 1 }, { adaptionName: "高清 720P", adaptionId: 1 }, { adaptionName: "流畅 360P", adaptionId: 1 }]} onOpenStateChange={setAdaptionSwitchPanelOpen} onAdaptionSwitched={() => { }} />
+          <AdaptionSwitchPanel open={adaptionSwitchPanelOpen} anchorEl={adaptionButtonRef.current} adaptions={adaptions} currentAdaptionId={currentAdaptionId} onOpenStateChange={setAdaptionSwitchPanelOpen} onAdaptionSwitched={() => { }} />
           {/* 播放速度按钮 */}
           <Button disableRipple sx={sxCommonButton} ref={speedRateSwitchPanelRef} onMouseEnter={() => setSpeedRateSwitchPanelOpen(true)} onMouseLeave={() => setSpeedRateSwitchPanelOpen(false)} >倍速</Button>
           {/* 倍速按钮 */}
@@ -320,6 +404,34 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title }) => {
       <Box sx={{ position: 'absolute', bottom: 0, width: '100%', visibility: `${isBriefMode ? 'unset' : 'hidden'}`, transition: 'visibility 0.1s ease-in' }}>
         <ProgressBar style={{ marginTop: '32px' }} brief currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
       </Box>
+      {/* DASH信息统计面板 */}
+      <MetricsPanel playerMatrics={playerMatrics} playerMetricsOpen={playerMetricsOpen} onMetricsPanelOpen={setPlayerMetricsOpen}/>
+      {/* 右键菜单 */}
+      <Menu onContextMenu={(e) => { setContextMenu(null); e.preventDefault(); }}
+        open={contextMenu !== null}
+        onClose={() => setContextMenu(null)}
+        anchorReference="anchorPosition"
+        anchorPosition={
+          contextMenu !== null
+            ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+            : undefined
+        }
+        sx={{ opacity: "0.85", }}
+        MenuListProps={
+          {
+            sx: {
+              bgcolor: "black",
+              opacity: "0.85",
+              color: "white"
+            }
+          }
+        }
+
+      >
+        <MenuItem onClick={() => { setContextMenu(null) }} sx={{ margin: "0px 20px" }}>快捷键说明</MenuItem>
+        {/* <Divider sx={{borderColor:"#fff", margin:"0px 36px"}}/> */}
+        <MenuItem onClick={() => { setPlayerMetricsOpen(true); setContextMenu(null) }} sx={{ margin: "0px 20px" }}>视频统计信息</MenuItem>
+      </Menu>
       {/* 右下角暂停图标 */}
     </Box>
   )
