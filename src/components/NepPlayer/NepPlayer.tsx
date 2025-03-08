@@ -164,6 +164,65 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
       // dashCleanUp = ()=>{
       //     player.off(MediaPlayer.events["MANIFEST_LOADED"],onManifestLoaded);
       // }
+
+      var lastLength = 0;
+      //dash数据检测相关
+      var handle = setInterval(() => {
+        /* 计算网络连接速度 与 网络下载量*/
+        //anyscript ...
+        var dashMetrics = dashPlayer.getDashMetrics()
+
+        var httpMetrics = dashMetrics.getHttpRequests("video");
+        var thisUpdate: any[] = httpMetrics.slice(lastLength)
+        var downloaded = 0;
+        for (var i = 0; i < thisUpdate.length; ++i) {
+          var receivedDataSizeRange = thisUpdate[i].range.split('-')
+          var receivedDataSize = parseInt(receivedDataSizeRange[1]) - parseInt(receivedDataSizeRange[0]);
+          downloaded += receivedDataSize;
+        }
+        lastLength = httpMetrics.length;
+        var bufferLevel = dashMetrics.getCurrentBufferLevel('video');
+
+
+        var streamInfo: any = dashPlayer.getActiveStream();
+        var dashAdapter: any = dashPlayer.getDashAdapter();
+
+        if (dashMetrics && streamInfo) {
+          streamInfo = streamInfo.getStreamInfo()
+          const periodIdx = streamInfo.index;
+          var videoRepSwitch: any = dashMetrics.getCurrentRepresentationSwitch('video');
+          var audioRepSwitch: any = dashMetrics.getCurrentRepresentationSwitch('audio');
+          if (videoRepSwitch === null) {
+            return;
+          }
+          var bufferLevel = dashMetrics.getCurrentBufferLevel('video');
+          var bitrate = videoRepSwitch ? Math.round(dashAdapter.getBandwidthForRepresentation(videoRepSwitch.to, periodIdx) / 1000) : NaN;
+          var adaptation = dashAdapter.getAdaptationForType(periodIdx, 'video', streamInfo);
+          var currentRep = adaptation.Representation_asArray.find(function (rep: any) {
+            return rep.id === videoRepSwitch.to
+          })
+          var frameRate = currentRep.frameRate;
+          var resolution = currentRep.width + 'x' + currentRep.height;
+          //frameRate fix for situation like 24000/1001 = 23.xxxx fps
+          var splitedFrameRate = frameRate.split("/")
+          if (splitedFrameRate.length == 2) {
+            frameRate = (splitedFrameRate[0] / splitedFrameRate[1]).toFixed(2)
+          }
+          var videoTrack = dashPlayer.getCurrentTrackFor("video");
+          var audioTrack = dashPlayer.getCurrentTrackFor("audio");
+
+          setPlayerMatrics({
+            codec: `${videoTrack ? videoTrack.codec : ''};${audioTrack ? audioTrack.codec : ''};`,
+            resolution: resolution + "@" + frameRate,
+            buffer: bufferLevel,
+            videoDataRate: dashAdapter.getBandwidthForRepresentation(videoRepSwitch.to, periodIdx) / 1000,
+            audtioDataRate: dashAdapter.getBandwidthForRepresentation(audioRepSwitch.to, periodIdx) / 1000,
+            downloadSpeed: downloaded
+          })
+          // console.log("network activity: ", (downloaded / 1024), 'kbps' , "buffer:", bufferLevel , "s", "resolution: ",resolution, "frameRate: ", frameRate, "videoBitrate: " ,bitrate ,"kbps" )
+
+        }
+      }, 1000)
     })();
 
 
@@ -405,7 +464,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
         <ProgressBar style={{ marginTop: '32px' }} brief currentTime={currentTime} duration={duration} buffered={bufferedTimeRanges} onSeek={handleProgressSeek} />
       </Box>
       {/* DASH信息统计面板 */}
-      <MetricsPanel playerMatrics={playerMatrics} playerMetricsOpen={playerMetricsOpen} onMetricsPanelOpen={setPlayerMetricsOpen}/>
+      <MetricsPanel playerMatrics={playerMatrics} playerMetricsOpen={playerMetricsOpen} onMetricsPanelOpen={setPlayerMetricsOpen} />
       {/* 右键菜单 */}
       <Menu onContextMenu={(e) => { setContextMenu(null); e.preventDefault(); }}
         open={contextMenu !== null}
