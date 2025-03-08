@@ -21,12 +21,13 @@ export interface AdaptionSwitchPanelProps {
     adaptionName: string,
     adaptionId: number,
   }[],
+  currentAdaptionId: number,
   onAdaptionSwitched: (adaption: string) => void,
   onOpenStateChange: (open: boolean) => void
 }
 
 export default function AdaptionSwitchPanel(props: AdaptionSwitchPanelProps) {
-  const [adaptions, setAdaptions] = React.useState([])
+
   // const onManifestLoaded = (e: CustomEvent) => {
   //     var adaptationSet: any[] = e.detail.data.Period.AdaptationSet;
   //     var videoRepresentation: any;
@@ -81,7 +82,7 @@ export default function AdaptionSwitchPanel(props: AdaptionSwitchPanelProps) {
         <Fade {...TransitionProps} timeout={350}>
           <Paper
             sx={{
-              bgcolor: "black",
+              bgcolor: "rgba(0,0,0,0.7)",
               marginBottom: 2,
               paddingTop: 1,
               paddingBottom: 1,
@@ -89,11 +90,23 @@ export default function AdaptionSwitchPanel(props: AdaptionSwitchPanelProps) {
           >
             <Stack>
               {
-                adaptions.map((adaption, index) => {
-                  return <Button key={index} sx={{ color: "white", width: "130px" }}>{adaption}</Button>
+                props.adaptions.map((adaption, index) => {
+                  return (
+                  <Button
+                    key={index}
+                    sx={[{
+                    color: "white",
+                    width: "130px",
+                    ":hover": { bgcolor: "rgba(255,255,255,0.3)" }
+                    },
+                    props.currentAdaptionId === adaption.adaptionId && { color: "rgba(59, 130, 236)" }]}
+                  >
+                    {adaption.adaptionName}
+                  </Button>
+                  )
                 })
               }
-              <Button sx={{ color: "white", width: "130px" }}>自动</Button>
+              <Button sx={{ color: "white", width: "130px", ":hover": { bgcolor: "rgba(255,255,255,0.3)" } }}>自动</Button>
             </Stack>
           </Paper>
         </Fade>
