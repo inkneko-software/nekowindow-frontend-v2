@@ -111,7 +111,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
   React.useEffect(() => {
     //获取video标签
     var video = document.getElementById("nep-player-video") as HTMLVideoElement;
-    console.log(video)
     if (video === null) {
       return;
     }
@@ -137,7 +136,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
     }
 
     video.ontimeupdate = () => {
-      console.log(video.currentTime)
       setCurrentTime(video.currentTime)
       setBufferedTimeRanges(video.buffered)
       setDuration(video.duration)
@@ -409,7 +407,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
     };
     if (adaptionId === 0) {
       dashPlayer.updateSettings(cfg);
-      dashPlayer.setAutoSwitchEnabledFor('video', false);
       setCurrentAdaptionId(adaptionId);
       return;
     }
