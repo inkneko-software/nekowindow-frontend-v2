@@ -20,7 +20,6 @@ import type {
   ResponseHomeRecommendVO,
   ResponseListPartitionInfo,
   ResponseListString,
-  ResponseListUserUploadedVideoStatisticsVO,
   ResponseListVideoPostBriefVO,
   ResponseString,
   ResponseVideoPostBriefVO,
@@ -37,8 +36,6 @@ import {
     ResponseListPartitionInfoToJSON,
     ResponseListStringFromJSON,
     ResponseListStringToJSON,
-    ResponseListUserUploadedVideoStatisticsVOFromJSON,
-    ResponseListUserUploadedVideoStatisticsVOToJSON,
     ResponseListVideoPostBriefVOFromJSON,
     ResponseListVideoPostBriefVOToJSON,
     ResponseStringFromJSON,
@@ -302,7 +299,7 @@ export class VideoControllerApi extends runtime.BaseAPI {
     /**
      * 获取已上传视频列表
      */
-    async getUserPostsRaw(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListUserUploadedVideoStatisticsVO>> {
+    async getUserPostsRaw(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseListVideoPostBriefVO>> {
         if (requestParameters.uid === null || requestParameters.uid === undefined) {
             throw new runtime.RequiredError('uid','Required parameter requestParameters.uid was null or undefined when calling getUserPosts.');
         }
@@ -324,19 +321,19 @@ export class VideoControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/v1/video/getUploadedVideos`,
+            path: `/api/v1/video/getUserPosts`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListUserUploadedVideoStatisticsVOFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseListVideoPostBriefVOFromJSON(jsonValue));
     }
 
     /**
      * 获取已上传视频列表
      */
-    async getUserPosts(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListUserUploadedVideoStatisticsVO> {
+    async getUserPosts(requestParameters: GetUserPostsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseListVideoPostBriefVO> {
         const response = await this.getUserPostsRaw(requestParameters, initOverrides);
         return await response.value();
     }

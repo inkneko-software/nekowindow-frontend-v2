@@ -5,6 +5,7 @@ models/EmailLoginDTO.ts
 models/MyUserDetailVO.ts
 models/ResponseMyUserDetailVO.ts
 models/ResponseObject.ts
+models/ResponseString.ts
 models/ResponseUserDetailVO.ts
 models/SendLoginEmailCodeDTO.ts
 models/UpdateUserDetailDTO.ts

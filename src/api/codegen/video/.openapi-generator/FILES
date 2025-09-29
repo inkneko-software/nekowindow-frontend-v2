@@ -14,12 +14,14 @@ models/ResponseListPartitionInfo.ts
 models/ResponseListString.ts
 models/ResponseListUserUploadedVideoStatisticsVO.ts
 models/ResponseListVideoPostBriefVO.ts
-models/ResponseObject.ts
 models/ResponseString.ts
+models/ResponseUserUploadedVideoStatisticsVO.ts
 models/ResponseVideoPostBriefVO.ts
 models/ResponseVideoPostDetailVO.ts
 models/UpdatePostBriefDTO.ts
+models/UpdateVideoResourceConversionStateDTO.ts
 models/UploadUserVO.ts
+models/UserUploadedVideoPostResourceVO.ts
 models/UserUploadedVideoStatisticsVO.ts
 models/VideoPostBriefVO.ts
 models/VideoPostDetailVO.ts

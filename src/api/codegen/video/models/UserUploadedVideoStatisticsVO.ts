@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import type { UserUploadedVideoPostResourceVO } from './UserUploadedVideoPostResourceVO';
+import {
+    UserUploadedVideoPostResourceVOFromJSON,
+    UserUploadedVideoPostResourceVOFromJSONTyped,
+    UserUploadedVideoPostResourceVOToJSON,
+} from './UserUploadedVideoPostResourceVO';
+
 /**
  * 
  * @export
@@ -57,6 +64,12 @@ export interface UserUploadedVideoStatisticsVO {
     description: string;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof UserUploadedVideoStatisticsVO
+     */
+    tags: Array<string>;
+    /**
+     * 
      * @type {number}
      * @memberof UserUploadedVideoStatisticsVO
      */
@@ -85,6 +98,12 @@ export interface UserUploadedVideoStatisticsVO {
      * @memberof UserUploadedVideoStatisticsVO
      */
     createdAt: Date;
+    /**
+     * 
+     * @type {Array<UserUploadedVideoPostResourceVO>}
+     * @memberof UserUploadedVideoStatisticsVO
+     */
+    uploadedVideoPostResourceVOS: Array<UserUploadedVideoPostResourceVO>;
 }
 
 /**
@@ -98,11 +117,13 @@ export function instanceOfUserUploadedVideoStatisticsVO(value: object): boolean 
     isInstance = isInstance && "duration" in value;
     isInstance = isInstance && "shared" in value;
     isInstance = isInstance && "description" in value;
+    isInstance = isInstance && "tags" in value;
     isInstance = isInstance && "state" in value;
     isInstance = isInstance && "partitionId" in value;
     isInstance = isInstance && "partitionName" in value;
     isInstance = isInstance && "reviewFailedReason" in value;
     isInstance = isInstance && "createdAt" in value;
+    isInstance = isInstance && "uploadedVideoPostResourceVOS" in value;
 
     return isInstance;
 }
@@ -123,11 +144,13 @@ export function UserUploadedVideoStatisticsVOFromJSONTyped(json: any, ignoreDisc
         'duration': json['duration'],
         'shared': json['shared'],
         'description': json['description'],
+        'tags': json['tags'],
         'state': json['state'],
         'partitionId': json['partitionId'],
         'partitionName': json['partitionName'],
         'reviewFailedReason': json['reviewFailedReason'],
         'createdAt': (new Date(json['createdAt'])),
+        'uploadedVideoPostResourceVOS': ((json['uploadedVideoPostResourceVOS'] as Array<any>).map(UserUploadedVideoPostResourceVOFromJSON)),
     };
 }
 
@@ -146,11 +169,13 @@ export function UserUploadedVideoStatisticsVOToJSON(value?: UserUploadedVideoSta
         'duration': value.duration,
         'shared': value.shared,
         'description': value.description,
+        'tags': value.tags,
         'state': value.state,
         'partitionId': value.partitionId,
         'partitionName': value.partitionName,
         'reviewFailedReason': value.reviewFailedReason,
         'createdAt': (value.createdAt.toISOString()),
+        'uploadedVideoPostResourceVOS': ((value.uploadedVideoPostResourceVOS as Array<any>).map(UserUploadedVideoPostResourceVOToJSON)),
     };
 }
 

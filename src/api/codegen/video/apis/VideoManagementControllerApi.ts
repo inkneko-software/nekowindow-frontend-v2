@@ -16,14 +16,14 @@
 import * as runtime from '../runtime';
 import type {
   ResponseListUserUploadedVideoStatisticsVO,
-  ResponseObject,
+  ResponseUserUploadedVideoStatisticsVO,
   UpdatePostBriefDTO,
 } from '../models/index';
 import {
     ResponseListUserUploadedVideoStatisticsVOFromJSON,
     ResponseListUserUploadedVideoStatisticsVOToJSON,
-    ResponseObjectFromJSON,
-    ResponseObjectToJSON,
+    ResponseUserUploadedVideoStatisticsVOFromJSON,
+    ResponseUserUploadedVideoStatisticsVOToJSON,
     UpdatePostBriefDTOFromJSON,
     UpdatePostBriefDTOToJSON,
 } from '../models/index';
@@ -77,9 +77,10 @@ export class VideoManagementControllerApi extends runtime.BaseAPI {
     }
 
     /**
+     * 若更新成功，返回已更新的当前视频信息
      * 更新已上传的视频信息
      */
-    async updateVideoPostRaw(requestParameters: UpdateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+    async updateVideoPostRaw(requestParameters: UpdateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseUserUploadedVideoStatisticsVO>> {
         if (requestParameters.updatePostBriefDTO === null || requestParameters.updatePostBriefDTO === undefined) {
             throw new runtime.RequiredError('updatePostBriefDTO','Required parameter requestParameters.updatePostBriefDTO was null or undefined when calling updateVideoPost.');
         }
@@ -98,13 +99,14 @@ export class VideoManagementControllerApi extends runtime.BaseAPI {
             body: UpdatePostBriefDTOToJSON(requestParameters.updatePostBriefDTO),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseUserUploadedVideoStatisticsVOFromJSON(jsonValue));
     }
 
     /**
+     * 若更新成功，返回已更新的当前视频信息
      * 更新已上传的视频信息
      */
-    async updateVideoPost(requestParameters: UpdateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+    async updateVideoPost(requestParameters: UpdateVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseUserUploadedVideoStatisticsVO> {
         const response = await this.updateVideoPostRaw(requestParameters, initOverrides);
         return await response.value();
     }

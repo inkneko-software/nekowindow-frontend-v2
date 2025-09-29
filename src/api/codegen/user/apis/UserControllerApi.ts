@@ -18,6 +18,7 @@ import type {
   EmailLoginDTO,
   ResponseMyUserDetailVO,
   ResponseObject,
+  ResponseString,
   ResponseUserDetailVO,
   SendLoginEmailCodeDTO,
   UpdateUserDetailDTO,
@@ -29,6 +30,8 @@ import {
     ResponseMyUserDetailVOToJSON,
     ResponseObjectFromJSON,
     ResponseObjectToJSON,
+    ResponseStringFromJSON,
+    ResponseStringToJSON,
     ResponseUserDetailVOFromJSON,
     ResponseUserDetailVOToJSON,
     SendLoginEmailCodeDTOFromJSON,
@@ -57,6 +60,32 @@ export interface UpdateUserDetailRequest {
  * 
  */
 export class UserControllerApi extends runtime.BaseAPI {
+
+    /**
+     * 获取头像上传链接
+     */
+    async generateAvatarUploadURLRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseString>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/user/generateAvatarUploadURL`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseStringFromJSON(jsonValue));
+    }
+
+    /**
+     * 获取头像上传链接
+     */
+    async generateAvatarUploadURL(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseString> {
+        const response = await this.generateAvatarUploadURLRaw(initOverrides);
+        return await response.value();
+    }
 
     /**
      * 查询用户资料

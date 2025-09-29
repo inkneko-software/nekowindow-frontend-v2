@@ -14,10 +14,21 @@
 
 
 import * as runtime from '../runtime';
+import type {
+  UpdateVideoResourceConversionStateDTO,
+} from '../models/index';
+import {
+    UpdateVideoResourceConversionStateDTOFromJSON,
+    UpdateVideoResourceConversionStateDTOToJSON,
+} from '../models/index';
 
 export interface UpdateVideoResourceRequest {
     videoId: number;
     dashMpdUrl: number;
+}
+
+export interface UpdateVideoResourceConversionStateRequest {
+    updateVideoResourceConversionStateDTO: UpdateVideoResourceConversionStateDTO;
 }
 
 /**
@@ -64,6 +75,36 @@ export class VideoInternalControllerApi extends runtime.BaseAPI {
      */
     async updateVideoResource(requestParameters: UpdateVideoResourceRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateVideoResourceRaw(requestParameters, initOverrides);
+    }
+
+    /**
+     */
+    async updateVideoResourceConversionStateRaw(requestParameters: UpdateVideoResourceConversionStateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters.updateVideoResourceConversionStateDTO === null || requestParameters.updateVideoResourceConversionStateDTO === undefined) {
+            throw new runtime.RequiredError('updateVideoResourceConversionStateDTO','Required parameter requestParameters.updateVideoResourceConversionStateDTO was null or undefined when calling updateVideoResourceConversionState.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/internal/video/updateVideoResourceConversionState`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdateVideoResourceConversionStateDTOToJSON(requestParameters.updateVideoResourceConversionStateDTO),
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async updateVideoResourceConversionState(requestParameters: UpdateVideoResourceConversionStateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateVideoResourceConversionStateRaw(requestParameters, initOverrides);
     }
 
 }
