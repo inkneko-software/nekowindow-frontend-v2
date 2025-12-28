@@ -8,20 +8,23 @@
     "start": "next start",
     "lint": "next lint",
     "api-user": "openapi-generator-cli generate -i http://localhost:3000/swagger/user/api-docs -o src/api/codegen/user -g typescript-fetch --skip-validate-spec",
-    "api-video": "openapi-generator-cli generate -i http://localhost:3000/swagger/video/api-docs -o src/api/codegen/video -g typescript-fetch --skip-validate-spec"
-
+    "api-video": "openapi-generator-cli generate -i http://localhost:3000/swagger/video/api-docs -o src/api/codegen/video -g typescript-fetch --skip-validate-spec",
+    "api-danmaku": "openapi-generator-cli generate -i http://localhost:3000/swagger/danmaku/api-docs -o src/api/codegen/danmaku -g typescript-fetch --skip-validate-spec"
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@fontsource/roboto": "^5.1.0",
     "@mui/icons-material": "^5.16.0",
     "@mui/material": "^5.15.20",
     "@mui/material-nextjs": "^5.15.11",
+    "@mui/x-date-pickers": "^7.18.0",
     "@openapitools/openapi-generator-cli": "^2.13.4",
     "dashjs": "^4.7.4",
     "date-fns": "^3.6.0",
     "next": "14.2.4",
+    "notistack": "^3.0.1",
     "react": "^18",
     "react-dom": "^18"
   },
