@@ -12,9 +12,11 @@ import AdaptionSwitchPanel from "./AdaptionSwitchPanel"
 import SpeedRateSwitchPanel from "./SpeedRateSwitchPanel"
 import VolumePanel from "./VolumePanel"
 import ProgressBar from "./ProgressBar"
-import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
+// import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
+import NekoDanmakuEngine from "@components/Danmaku/Danmaku"
 import MetricsPanel from "./MetricsPanel"
 import { MediaPlayer } from "dashjs"
+import { useVideoPostDetailContext } from "@app/video/[nkid]/context"
 
 interface NepPlayerProps {
   src: string
@@ -108,6 +110,8 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
   const [dashPlayer, setDashPlayer] = React.useState<any>(null);
 
+  const postContext = useVideoPostDetailContext()
+
   React.useEffect(() => {
     //获取video标签
     var video = document.getElementById("nep-player-video") as HTMLVideoElement;
@@ -115,10 +119,13 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
       return;
     }
 
-    //弹幕引擎初始化
-    var danmakuWrap = document.getElementById("nep-player-danmaku") as HTMLElement;
-    var danmakuEngine = new NekoDanmakuEngine(danmakuWrap);
-    setDanmakuEngine(danmakuEngine)
+    if (postContext !== null){
+          //弹幕引擎初始化
+        var danmakuWrap = document.getElementById("nep-player-danmaku") as HTMLElement;
+        var danmakuEngine = new NekoDanmakuEngine(danmakuWrap, postContext.videoPostDetail.videos[postContext.currentPart].videoId);
+        setDanmakuEngine(danmakuEngine);
+    }
+
 
     //video事件监听
     video.onclick = () => {
@@ -160,9 +167,37 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
 
     //dash播放器初始化
-    (async () => {
+    const loadDashPlayer = async () => {
       var dashMediaPlayer = MediaPlayer().create();
+      // 设置初始清晰度为最高清晰度
+      var cfg = {
+        'streaming': {
+          'abr': {
+            'autoSwitchBitrate': {
+              video: false
+            }
+          }
+        }
+      };
+      //https://cdn.dashjs.org/v4.7.4/jsdoc/module-MediaPlayer.html#setQualityFor
+      //切换清晰度需要关闭ABR的自动码率切换
+      cfg.streaming.abr.autoSwitchBitrate['video'] = false;
+      dashMediaPlayer.updateSettings(cfg);
+
+      let defaultAdaptionId = adaptions.length - 1;
+      console.log("initial adaption id: " ,defaultAdaptionId)
+      setCurrentAdaptionId(adaptions[adaptions.length - defaultAdaptionId - 1].adaptionId);
+
       dashMediaPlayer.initialize(videoRef.current, src, true);
+      //问题在于初始化的时候无法设置清晰度，需要循环重复设置才能设置成功
+
+      let defaultQualityHandle = setInterval(()=>{
+        dashMediaPlayer.setQualityFor("video", defaultAdaptionId, false);
+        clearInterval(defaultQualityHandle)
+      },1000)
+
+
+
       setDashPlayer(dashMediaPlayer);
       //事件注册
       // player.on(MediaPlayer.events["MANIFEST_LOADED"],onManifestLoaded);
@@ -207,6 +242,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
           var currentRep = adaptation.Representation_asArray.find(function (rep: any) {
             return rep.id === videoRepSwitch.to
           })
+          console.log(currentRep)
           var frameRate = currentRep.frameRate;
           var resolution = currentRep.width + 'x' + currentRep.height;
           //frameRate fix for situation like 24000/1001 = 23.xxxx fps
@@ -230,7 +266,13 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
         }
       }, 1000)
 
-    })();
+    };
+
+    if (src.endsWith('.mpd')){
+      loadDashPlayer();
+    }else{
+      video.src = src;
+    }
 
 
 
@@ -327,7 +369,7 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
       playerWrap.onmousemove = null;
       playerWrap.onmouseleave = null;
       controllButtons.onmousemove = null;
-      danmakuEngine.destory();
+      // danmakuEngine.destory();
     }
 
   }, [src])
@@ -339,19 +381,23 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
 
     const handleInsertDanmaku = (data: Event) => {
       var e = data as CustomEvent<CustomDanmakuEvent>
-      danmakuEngine.insertDanmaku({
-        //弹幕id
-        danmaku_id: 0,
-        //内容
-        content: e.detail.content,
-        //出现时间（秒）
-        progress: currentTime,
-        // 颜色
-        color: 0xffffff,
-        // 是否已发送
-        fired: false
-      });
+      // danmakuEngine.insertDanmaku({
+      //   //弹幕id
+      //   danmaku_id: 0,
+      //   //内容
+      //   content: e.detail.content,
+      //   //出现时间（秒）
+      //   progress: currentTime,
+      //   // 颜色
+      //   color: 0xffffff,
+      //   // 是否已发送
+      //   fired: false
+      // });
     }
+
+    (async()=>{
+      
+    })()
 
     document.addEventListener("danmaku::insert", handleInsertDanmaku)
     return () => {
@@ -422,13 +468,16 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
     cfg.streaming.abr.autoSwitchBitrate['video'] = false;
     dashPlayer.updateSettings(cfg);
     dashPlayer.setQualityFor("video", selectedAdaptionIndex, false);
+    console.log("切换清晰度", selectedAdaptionIndex)
     setCurrentAdaptionId(adaptionId);
     // cfg.streaming.abr.autoSwitchBitrate[item.mediaType] = true;
     // self.player.updateSettings(cfg);
   }
 
   const onFullscreenChange = (newType: FullscreenType) => {
-    // engine.oncontainerchange()
+    if (danmakuEngine !== undefined){
+      danmakuEngine.oncontainerchange()
+    }
     if (newType !== "normal") {
       document.body.style.overflow = "hidden"
     } else {
