@@ -18,9 +18,15 @@ import SendRoundedIcon from '@mui/icons-material/SendRounded';
 import Head from 'next/head';
 import DefaultErrorPage from 'next/error'
 import { useRouter } from 'next/navigation';
-import NepPlayer, { CustomDanmakuEvent } from '@components/NepPlayer/NepPlayer';
-import { Configuration, UploadUserVO, VideoControllerApi } from '@api/codegen/video';
+import { Configuration as VideoAPIConfiguration, UploadUserVO, VideoControllerApi, VideoPostDetailVO } from '@api/codegen/video';
+import { Configuration as DanmakuAPIConfiguration, DanmakuControllerApi } from '@api/codegen/danmaku';
 
+import { useVideoPostDetailContext } from './context';
+import dynamic from 'next/dynamic';
+import { DanmakuBullet } from '@components/Danmaku/Danmaku';
+
+const NepPlayer = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
+const CustomDanmakuEvent = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
 
 const SocialSection = styled('div')(({ theme }) => ({
   marginTop: "5px",
@@ -29,30 +35,53 @@ const SocialSection = styled('div')(({ theme }) => ({
   // backgroundColor: "purple"
 }));
 
-export default function VideoPage({ params }: { params: { nkid: number } }) {
-  const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+/**
+ * 
+  视频质量	代号	说明
+  1080P 60帧	10	原视频帧率>=60帧。转码后码率不高于8Mbps
+  1080P 高码率	11	原视频帧率小于60帧，但码率大于3Mbps。转码后码率不高于8Mbps
+  1080P	12	最高码率3Mbps，帧率不超过59帧
+  720P	20	最高码率1Mbps
+  360P	30	最高码率500Kbps
+  */
+const videoAdaptionsMap = new Map<string, string>();
+videoAdaptionsMap.set("0", "自动");
+videoAdaptionsMap.set("10", "1080P 60帧");
+videoAdaptionsMap.set("11", "1080P 高码率");
+videoAdaptionsMap.set("12", "1080P 高清");
+videoAdaptionsMap.set("20", "720P 超清");
+videoAdaptionsMap.set("30", "360P 流畅");
+export default function VideoPage({ }) {
+  const videoapi = new VideoControllerApi(new VideoAPIConfiguration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+  const danmakuAPI = new DanmakuControllerApi(new DanmakuAPIConfiguration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
+
 
   const theme = useTheme();
   const router = useRouter();
 
-  const [post, setPost] = React.useState({
-    nkid: 1,
-    title: "标题加载中",
-    description: "",
-    uid: 0,
-    vid: 0,
-    cid: 0,
-    visit: 0,
-    danmaku: 0,
-    coin: 0,
-    collection: 0,
-    comment: 0,
-    created_at: new Date(0),
-    tags: ['123'],
-    partition: "",
-    dash_mpd_path: ''
-  })
+  const videoPostDetailContext = useVideoPostDetailContext();
 
+  if (!videoPostDetailContext) {
+    throw new Error("videoPostDetailContext is null");
+  }
+
+  const nkid = videoPostDetailContext.nkid;
+  const post = videoPostDetailContext.videoPostDetail;
+  const video = post.videos[0];
+  const videoAdaptions = video.videoAdaptions.split(',').map((adaption) => {
+    return {
+      adaptionName: videoAdaptionsMap.get(adaption) || "未知质量",
+      adaptionId: parseInt(adaption)
+    }
+  });
+
+  //这几个数据后续应该单独获取，从Layout中传递过来
+  const danmaku = 0
+  const comment = 0;
+  const visit = 0;
+  const partition = '';
+
+  // 上传者信息
   const [uploader, setUploader] = React.useState<UploadUserVO>({
     userId: 0,
     username: "用户加载中",
@@ -61,18 +90,38 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
     fans: 0
   })
 
-  const [danmaku, setDanmaku] = React.useState("");
+  // 当前登录用户信息
+  const [memberInfo, setMemberInfo] = React.useState({
+    face_url: "",
+    nick: "",
+  })
 
+  const [danmakus, setDanmakus] = React.useState<DanmakuBullet[]>([])
   React.useEffect(() => {
-    videoapi.getVideoPostDetail({ nkid: params.nkid }).then(res => {
-      if (res.data) {
-        var shit = res.data.videos[0].dashMpdUrl as string;
-        console.log(shit)
-        setUploader(res.data.uploader)
-        setPost({ ...post, title: res.data.title as string, tags: res.data.tags as string[], dash_mpd_path: shit, description: res.data.description as string, created_at: res.data.createdAt });
+    danmakuAPI.getChatRoomByVideoResourceId({ videoResourceId: videoPostDetailContext.videoPostDetail.videos[0].videoId }).then(res => {
+      if (res.code !== 0 || res.data === null || res.data === undefined) {
+        return;
       }
+      var chatRoomId = res.data.chatId;
+      if (chatRoomId === null || chatRoomId === undefined) {
+        return;
+      }
+
+      danmakuAPI.getRecentDanmakuList({ chatRoomId: chatRoomId }).then(res => {
+        if (res.data === null || res.data === undefined) {
+          return;
+        }
+        setDanmakus(res.data.map(item => ({
+                    danmaku_id: item.messageId,
+                    content: item.content,
+                    progress: item.progress,
+                    color: item.colorHex,
+                    fired: false,
+                    created_at: item.createdAt,
+                })))
+      })
     })
-  }, [])
+  }, [videoPostDetailContext.nkid])
 
   const handleSendDanmaku = () => {
     var danmakuInput = document.getElementById("danmaku-input") as HTMLInputElement;
@@ -81,12 +130,12 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
       return;
     }
 
-    var event = new CustomEvent<CustomDanmakuEvent>("danmaku::insert", {
-      detail: {
-        content: danmaku
-      }
-    })
-    document.dispatchEvent(event);
+    // var event = new CustomEvent<CustomDanmakuEvent>("danmaku::insert", {
+    //   detail: {
+    //     content: danmaku
+    //   }
+    // })
+    // document.dispatchEvent(event);
     danmakuInput.value = "";
   }
 
@@ -95,36 +144,6 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
       handleSendDanmaku();
     }
   }
-
-
-
-
-
-  // nkid = "m5y7OJLqxN4lrogz"
-  //BkRaVzLXArZOgKDp/source.mpd
-  //D2nx6dWlP5WJyK0Q/source.mpd
-  //m5y7OJLqxN4lrogz/source.mpd
-  const [memberInfo, setMemberInfo] = React.useState({
-    face_url: "",
-    nick: "",
-  })
-
-  let uploadColor = "black";
-  if (true) {
-    uploadColor = "#ef5350"
-  }
-
-  // if (post.nkid === 0) {
-  //   return (
-  //     <Box sx={{ width: "100vw", height: "100vh", display: "flex" }}>
-  //       <Typography sx={{ margin: "auto" }}>您所查询的稿件不存在，或已删除</Typography>
-  //     </Box>
-  //   )
-  // }
-
-  // const onMemberInfoUpdate = (member) => {
-  //     setMemberInfo(member)
-  // }
 
   return (
     <Box sx={{ minWidth: "1360px", minHeight: "768px" }}>
@@ -141,7 +160,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
           display: "flex",
         }} >
         {/* 左侧 */}
-        <Box sx={{ display: "flex", flexDirection: "column", flex: '1 ' }}>
+        <Box sx={{ display: "flex", flexDirection: "column", width: "75%" }}>
           {/* 视频标题 与 视频详细信息 */}
           <Box sx={{ height: '64px', display: "flex", flexDirection: "column", margin: '16px 0px', marginRight: "auto" }}>
             {/* 视频标题 */}
@@ -150,7 +169,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
             </Typography>
             {/* 视频详细信息 */}
             <Typography sx={{ color: "gray", margin: '8px 0px' }} variant='body2' component="div">
-              {`${post.visit}播放 · 总弹幕数${post.danmaku}`} &nbsp; &nbsp;{`${post.created_at.toLocaleString()}`}
+              {`${visit}播放 · 总弹幕数${danmaku}`} &nbsp; &nbsp;{`${post.createdAt.toLocaleString()}`}
             </Typography>
           </Box>
           {/* 播放器 */}
@@ -162,7 +181,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
             borderRadius: '4px',
             overflow: 'hidden'
           }}>
-            <NepPlayer title={'测试标题'} src={post.dash_mpd_path} />
+            <NepPlayer title={video.title} src={video.dashMpdUrl} adaptions={videoAdaptions} danmakus={danmakus} />
           </Box>
           {/* 弹幕控制面板 */}
           <Paper sx={{ display: "flex", padding: "0px 10px", borderRadius: "0", height: "40px" }} elevation={1}>
@@ -188,7 +207,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Typography variant='body2' sx={{ marginBottom: "10px", marginLeft: 1, whiteSpace: "pre-line" }}>{post.description}</Typography>
             <Stack direction="row" spacing={1}>
-              <Chip label={post.partition} size="small" onClick={() => { }} />
+              <Chip label={partition} size="small" onClick={() => { }} />
               {
                 post.tags.map((tag, index) => {
                   return <Chip label={tag} key={index} size="small" onClick={() => { }} />
@@ -199,19 +218,19 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
           {/* comment area */}
           <Box sx={{ display: 'flex' }}>
             <SocialSection>
-              <CommentPanel face_url={memberInfo.face_url} nick={memberInfo.nick} vid={post.vid} nkid={post.nkid} />
+              <CommentPanel face_url={memberInfo.face_url} nick={memberInfo.nick} vid={video.videoId} nkid={post.nkid} />
             </SocialSection>
             {/* <RecommentPannel/> */}
           </Box>
         </Box>
 
         {/* 右侧 */}
-        <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 2, width: '420px' }}>
+        <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 2, minWidth: '420px', width: '25%' }}>
           {/* up主信息 */}
           <Box sx={{ margin: "16px 0px", display: "flex", flexDirection: "row", height: "64px" }}>
             <Avatar src={uploader.avatarUrl} />
             <Box sx={{ marginLeft: "8px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-              <Typography sx={{ fontSize: "0.9em" }} variant="h6" component="div" style={{ color: uploadColor }}>
+              <Typography sx={{ fontSize: "0.9em" }} variant="h6" component="div" style={{ color: '#ef5350' }}>
                 {uploader.username}
               </Typography>
               <Typography sx={{ fontSize: "0.5em", color: "gray" }} variant="body2" component="div">
@@ -246,7 +265,7 @@ export default function VideoPage({ params }: { params: { nkid: number } }) {
             </AccordionDetails>
           </Accordion>
           {/* 弹幕面板/聊天面板 */}
-          <DanmakuPanel />
+          <DanmakuPanel danmakus={danmakus}/>
           {/* 推荐 */}
           <RecommendPannel sx={{ marginTop: 3 }} />
         </Box>

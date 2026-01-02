@@ -15,6 +15,8 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { DanmakuBullet } from './Danmaku';
+import dayjs from 'dayjs';
 
 const DanmakuPanelWrap = styled('div')(({ theme }) => ({
     backgroundColor: 'white',
@@ -71,23 +73,16 @@ const TableContainerWrap = styled(TableContainer)(({ theme }) => ({
     }
 }))
 
-function createData(name, calories, fat) {
-    return { name, calories, fat };
+interface DanmakuPanelProps {
+    danmakus: DanmakuBullet[]
 }
-
-var rows = [
-];
-
-//TODO: 使用react-visualize进行列表优化
-for (var i = 0; i < 30; i++) {
-    rows.push(createData('00:' + i.toString().padStart(2, '0'), "测试弹幕测试弹幕测试弹幕测试弹幕测试弹幕测试弹幕", "05-03 19:00"));
-}
-
-
-export default function DanmakuPanel(props) {
+export default function DanmakuPanel({ danmakus }: DanmakuPanelProps) {
+    const calculateDuration = (time: number) => {
+        return `${Math.floor(time / 60).toString().padStart(2, '0')}:${Math.floor(time % 60).toString().padStart(2, '0')}`;
+    }
     return (
         <DanmakuPanelWrap>
-            <Accordion elevation={0} sx={{borderRadius: '4px'}}>
+            <Accordion elevation={0} sx={{ borderRadius: '4px' }}>
                 <AccordionSummary
                     sx={{ bgcolor: "#eeeeee" }}
                     expandIcon={<ExpandMoreIcon />}
@@ -97,8 +92,8 @@ export default function DanmakuPanel(props) {
                     <Typography variant="body1" >弹幕列表</Typography>
 
                 </AccordionSummary>
-                <AccordionDetails sx={{ padding: 0 }} elevation={0}>
-                    <TableContainerWrap component={Paper} >
+                <AccordionDetails sx={{ padding: 0 }} >
+                    <TableContainerWrap >
                         <Table sx={{ width: '100%' }} size="small" aria-label="simple table">
                             <TableHead>
                                 <TableRow>
@@ -109,21 +104,21 @@ export default function DanmakuPanel(props) {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow key={row.name} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                                {danmakus.sort((a, b) => a.progress - b.progress).map((danmaku) => (
+                                    <TableRow key={danmaku.danmaku_id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                         <TableCell component="th" scope="row">
                                             <Box sx={{ textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden", width: "40px", display: "block", fontSize: "1em" }}>
-                                                {row.name}
+                                                {calculateDuration(danmaku.progress)}
                                             </Box>
                                         </TableCell>
                                         <TableCell align="left" sx={{ paddingLeft: 0, paddingRight: 0 }} >
                                             <Box sx={{ textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden", width: "160px", display: "block", fontSize: "1em" }}>
-                                                {row.calories}
+                                                {danmaku.content}
                                             </Box>
                                         </TableCell>
                                         <TableCell align="left" sx={{ paddingLeft: 0, paddingRight: 0 }}>
                                             <Box sx={{ textOverflow: "ellipsis", whiteSpace: "nowrap", overflow: "hidden", display: "block", fontSize: "1em" }}>
-                                                {row.fat}
+                                                {dayjs(danmaku.created_at).format('MM-DD HH:mm')}
                                             </Box>
                                         </TableCell>
                                     </TableRow>

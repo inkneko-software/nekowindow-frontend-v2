@@ -1,13 +1,3 @@
-/**
- *   {
-    "danmaku_id": 97,
-    "content": "有内味了",
-    "progress": 18.19,
-    "color": 6844407,
-    "fired": false
-  },
- */
-
 import { Configuration, DanmakuControllerApi } from "@api/codegen/danmaku";
 
 export interface DanmakuBullet {
@@ -30,6 +20,8 @@ export interface DanmakuBullet {
     duration?: number,
     //通过的速度
     speed?: number,
+
+    created_at?: Date,
 }
 
 interface DanmakuTrajectory {
@@ -62,31 +54,31 @@ export default class NekoDanmakuEngine {
         this.trajectorys = [];
         this.hide = false;
         this.bullets = [];
-        var danmakuAPI = new DanmakuControllerApi(new Configuration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
+        // var danmakuAPI = new DanmakuControllerApi(new Configuration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
 
-        danmakuAPI.getChatRoomByVideoResourceId({ videoResourceId: videoResourceId }).then(res => {
-            if (res.code !== 0 || res.data === null || res.data === undefined) {
-                return;
-            }
-            var chatRoomId = res.data.chatId;
-            if (chatRoomId === null || chatRoomId === undefined) {
-                return;
-            }
+        // danmakuAPI.getChatRoomByVideoResourceId({ videoResourceId: videoResourceId }).then(res => {
+        //     if (res.code !== 0 || res.data === null || res.data === undefined) {
+        //         return;
+        //     }
+        //     var chatRoomId = res.data.chatId;
+        //     if (chatRoomId === null || chatRoomId === undefined) {
+        //         return;
+        //     }
 
-            danmakuAPI.getRecentDanmakuList({ chatRoomId: chatRoomId }).then(res => {
-                if (res.data === null || res.data === undefined) {
-                    return;
-                }
+        //     danmakuAPI.getRecentDanmakuList({ chatRoomId: chatRoomId }).then(res => {
+        //         if (res.data === null || res.data === undefined) {
+        //             return;
+        //         }
 
-                this.bullets = res.data.map(item => ({
-                    danmaku_id: item.messageId,
-                    content: item.content,
-                    progress: item.progress,
-                    color: item.colorHex,
-                    fired: false
-                }))
-            })
-        })
+        //         this.bullets = res.data.map(item => ({
+        //             danmaku_id: item.messageId,
+        //             content: item.content,
+        //             progress: item.progress,
+        //             color: item.colorHex,
+        //             fired: false
+        //         }))
+        //     })
+        // })
 
 
 
