@@ -9,7 +9,7 @@ import CommentPanel from '@components/Comment/CommentPanel';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import DanmakuPanel from '@components/Danmaku/DanmakuPanel';
-import RecommendPannel from '@components/Recommend/RecommendPanel';
+import RecommendPanel from '@components/Recommend/RecommendPanel';
 import CoinIcon from '@components/Icons/CoinIcon';
 import CoinIconFilled from '@components/Icons/CoinIconFilled';
 import FormatColorTextRoundedIcon from '@mui/icons-material/FormatColorTextRounded';
@@ -267,7 +267,7 @@ export default function VideoPage({ }) {
           {/* 弹幕面板/聊天面板 */}
           <DanmakuPanel danmakus={danmakus}/>
           {/* 推荐 */}
-          <RecommendPannel sx={{ marginTop: 3 }} />
+          <RecommendPanel sx={{ marginTop: 3 }} />
         </Box>
       </Container >
     </Box >
