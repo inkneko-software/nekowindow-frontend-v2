@@ -27,6 +27,7 @@ import { UploadDialog } from './UploadDialog';
 
 import { Configuration, PartitionInfo, UserUploadedVideoStatisticsVO, VideoControllerApi, VideoManagementControllerApi, VideoPostBriefVO } from '@api/codegen/video';
 import { useSearchParams } from 'next/navigation';
+import PostEditDialog from './PostEditDialog';
 
 
 
@@ -38,22 +39,50 @@ const UploadHome: React.FC = () => {
   const [tabIndex, setTabIndex] = React.useState(0)
   const [uploadedVideos, setUploadedVideos] = React.useState<UserUploadedVideoStatisticsVO[]>([]);
 
+  const [postEditDialogOpen, setPostEditDialogOpen] = React.useState(false);
+  const [selectedEditingPost, setSelectedEditingPost] = React.useState({} as UserUploadedVideoStatisticsVO);
   const searchParams = useSearchParams();
   const requestUpload = searchParams.get("requestUpload");
   React.useEffect(() => {
     videoManagementAPI.getUploadedVideos().then(res => {
       setUploadedVideos(res.data as UserUploadedVideoStatisticsVO[])
     })
-    
+
     //通过该参数控制是否默认打开上传框
-    if (requestUpload == "1"){
+    if (requestUpload == "1") {
       setUploadDialogOpen(true);
     }
   }, [])
 
+  const calculateTranscodeProgress = (vo: UserUploadedVideoStatisticsVO) => {
+    let count = 0;
+    for (let videoResource of vo.uploadedVideoPostResourceVOS) {
+      if (videoResource.conversionState === 3) {
+        count++;
+      }
+    }
+    console.log(count, vo)
+    return `${count}/${vo.uploadedVideoPostResourceVOS.length} 视频转码完成`
+  }
+
+  const handleOpenEditPostDialog = (e: React.MouseEvent<HTMLButtonElement>, post: UserUploadedVideoStatisticsVO) => {
+    setPostEditDialogOpen(true);
+    setSelectedEditingPost(post);
+  }
+
+  const calculateDuration = (vo: UserUploadedVideoStatisticsVO) => {
+    let duration = 0;
+    for (let videoResource of vo.uploadedVideoPostResourceVOS) {
+      if (videoResource.duration){
+        duration += videoResource.duration;
+      }
+    }
+    return `${Math.floor(duration / 60).toString().padStart(2, '0')}:${Math.floor(duration % 60).toString().padStart(2, '0')}`;
+  }
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <UploadDialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} />
+      <PostEditDialog open={postEditDialogOpen} onClose={() => setPostEditDialogOpen(false)} post={selectedEditingPost} />
       <Box sx={{ display: 'flex', margin: '32px 32px 8px 32px' }}>
         <Typography sx={{ marginRight: '16px' }} variant='h5' >内容管理</Typography>
         <Button startIcon={<DriveFolderUploadOutlinedIcon />} onClick={() => setUploadDialogOpen(true)}>新建投稿</Button>
@@ -68,8 +97,9 @@ const UploadHome: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ paddingLeft: '32px' }} width='35%'>视频</TableCell>
-              <TableCell >公开范围</TableCell>
+              <TableCell sx={{ paddingLeft: '32px' }} width='35%'>稿件</TableCell>
+              <TableCell>状态</TableCell>
+              <TableCell>公开范围</TableCell>
               <TableCell>日期</TableCell>
               <TableCell >观看次数</TableCell>
               <TableCell >评论数</TableCell>
@@ -90,13 +120,26 @@ const UploadHome: React.FC = () => {
                       <Box component='a' href={`/video/${val.nkid}`} target='_blank' sx={{ position: 'relative', width: '127px', height: '72px', borderRadius: '8%', overflow: 'hidden', border: '1px #e3e3e3 solid' }}>
                         <Box component='img' sx={{ width: '100%', height: '100%', positoin: 'absolute' }} src={val.coverUrl} />
                         <Box sx={{ borderRadius: '16%', position: 'absolute', bottom: 0, right: '4px', overflow: 'hidden' }}>
-                          <Typography sx={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 4px' }} variant='caption'>12:34:56</Typography>
+                          <Typography sx={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 4px' }} variant='caption'>{calculateDuration(val)}</Typography>
                         </Box>
                       </Box>
                       {/* 视频标题与说明 */}
                       <Box sx={{ display: 'flex', flexDirection: 'column', marginLeft: '16px', justifyContent: 'space-evenly' }}>
                         <Typography variant='body2'>{val.title}</Typography>
-                        <Typography variant='body2' color='#a0a0a0'>{val.description}</Typography>
+                        <Typography variant='body2' color='#a0a0a0'>{val.description.length === 0 ? "暂无简介" : val.description}</Typography>
+                        <Box sx={{ display: 'flex', flex: '0 0 auto' }}>
+                          <Button variant='outlined' size='small' sx={{ boxShadow: 'unset' }} onClick={e=>handleOpenEditPostDialog(e, val)} >编辑</Button>
+                          <Button variant='outlined' size='small' sx={{ marginLeft: "8px", boxShadow: 'unset' }}>删除</Button>
+
+
+                        </Box>
+                      </Box>
+                    </TableCell>
+                    <TableCell >
+                      <Box sx={{ marginLeft: "8px", display: 'flex', flexDirection: 'column' }}>
+                        <Typography variant='caption' >{`共${val.uploadedVideoPostResourceVOS.length}个视频`}</Typography>
+                        <Typography variant='caption' >{calculateTranscodeProgress(val)}</Typography>
+                        <Typography variant='caption' >审核中</Typography>
                       </Box>
                     </TableCell>
                     <TableCell >公开范围</TableCell>
