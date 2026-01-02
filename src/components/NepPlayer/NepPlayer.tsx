@@ -13,7 +13,7 @@ import SpeedRateSwitchPanel from "./SpeedRateSwitchPanel"
 import VolumePanel from "./VolumePanel"
 import ProgressBar from "./ProgressBar"
 // import { Danmaku, NekoDanmakuEngine } from "@components/Danmaku/Danmaku"
-import NekoDanmakuEngine from "@components/Danmaku/Danmaku"
+import NekoDanmakuEngine, { DanmakuBullet } from "@components/Danmaku/Danmaku"
 import MetricsPanel from "./MetricsPanel"
 import { MediaPlayer } from "dashjs"
 import { useVideoPostDetailContext } from "@app/video/[nkid]/context"
@@ -24,7 +24,8 @@ interface NepPlayerProps {
   adaptions: {
     adaptionName: string,
     adaptionId: number,
-  }[]
+  }[],
+  danmakus?: DanmakuBullet[]
 }
 
 type PlayerWindowState = 'normal' | 'browser-full' | 'screen-full';
@@ -56,7 +57,7 @@ export interface IVideoPlayBackRateEvnet {
 
 export type FullscreenType = "normal" | "browser" | "window"
 
-const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
+const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus }) => {
   const [paused, setPaused] = React.useState(true);
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
@@ -123,6 +124,9 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions }) => {
           //弹幕引擎初始化
         var danmakuWrap = document.getElementById("nep-player-danmaku") as HTMLElement;
         var danmakuEngine = new NekoDanmakuEngine(danmakuWrap, postContext.videoPostDetail.videos[postContext.currentPart].videoId);
+        if (danmakus){
+          danmakuEngine.loadDanmakus(danmakus)
+        }
         setDanmakuEngine(danmakuEngine);
     }
 
