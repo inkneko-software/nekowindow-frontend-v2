@@ -9,7 +9,6 @@ import theme from '@theme/theme';
 import { Configuration, UserControllerApi } from '@api/codegen/user';
 import useToast from '@components/Common/Toast';
 
-const userControllerApi = new UserControllerApi(new Configuration({credentials: 'include', basePath: process.env.basePath}));
 
 interface LoginDialogProps {
   open: boolean,
@@ -17,6 +16,8 @@ interface LoginDialogProps {
 }
 
 const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose }) => {
+  const userControllerApi = new UserControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
+
   const [showPassword, setShowPassword] = React.useState(false);
   const [passwordLoginTabSelected, setPasswordLoginTabSelected] = React.useState(true);
   const [email, setEmail] = React.useState('');
@@ -77,14 +78,14 @@ const LoginDialog: React.FC<LoginDialogProps> = ({ open, onClose }) => {
       return;
     }
 
-    userControllerApi.login({emailLoginDTO: {email: email, code: emailCode}}).then(r=>{
-      if (r.code !== 0){
+    userControllerApi.login({ emailLoginDTO: { email: email, code: emailCode } }).then(r => {
+      if (r.code !== 0) {
         makeToast(r.message, 'error');
         return;
       }
 
       makeToast(r.message);
-      setTimeout(()=>{
+      setTimeout(() => {
         location.reload();
       }, 1000)
     })
