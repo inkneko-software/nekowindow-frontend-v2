@@ -125,7 +125,7 @@ const UploadHome: React.FC = () => {
                   <TableRow >
                     <TableCell sx={{ paddingLeft: '32px', display: 'flex' }}>
                       {/* 视频封面 */}
-                      <Box component='a' href={`/video/${val.nkid}`} target='_blank' sx={{ position: 'relative', width: '127px', height: '72px', borderRadius: '8%', overflow: 'hidden', border: '1px #e3e3e3 solid' }}>
+                      <Box component='a' href={`/video/${val.nkid}`} target='_blank' sx={{ position: 'relative', minWidth: '127px', minHeight: '72px', width: '127px', height: '72px', borderRadius: '8%', overflow: 'hidden', border: '1px #e3e3e3 solid' }}>
                         <Box component='img' sx={{ width: '100%', height: '100%', positoin: 'absolute' }} src={val.coverUrl} />
                         <Box sx={{ borderRadius: '16%', position: 'absolute', bottom: 0, right: '4px', overflow: 'hidden' }}>
                           <Typography sx={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 4px' }} variant='caption'>{calculateDuration(val)}</Typography>
