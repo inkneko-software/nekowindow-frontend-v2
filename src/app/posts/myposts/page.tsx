@@ -28,6 +28,7 @@ import { UploadDialog } from './UploadDialog';
 import { Configuration, PartitionInfo, UserUploadedVideoStatisticsVO, VideoControllerApi, VideoManagementControllerApi, VideoPostBriefVO } from '@api/codegen/video';
 import { useSearchParams } from 'next/navigation';
 import PostEditDialog from './PostEditDialog';
+import DeleteConfirmDialog from './DeleteConfirmDialog';
 
 
 
@@ -39,8 +40,8 @@ const UploadHome: React.FC = () => {
   const [tabIndex, setTabIndex] = React.useState(0)
   const [uploadedVideos, setUploadedVideos] = React.useState<UserUploadedVideoStatisticsVO[]>([]);
 
-  const [postEditDialogOpen, setPostEditDialogOpen] = React.useState(false);
-  const [selectedEditingPost, setSelectedEditingPost] = React.useState({} as UserUploadedVideoStatisticsVO);
+  const [selectedEditingPost, setSelectedEditingPost] = React.useState<null | UserUploadedVideoStatisticsVO>(null);
+  const [selectedDeletingPost, setSelectedDeletingPost] = React.useState<null | UserUploadedVideoStatisticsVO>(null);
   const searchParams = useSearchParams();
   const requestUpload = searchParams.get("requestUpload");
   React.useEffect(() => {
@@ -65,24 +66,31 @@ const UploadHome: React.FC = () => {
     return `${count}/${vo.uploadedVideoPostResourceVOS.length} 视频转码完成`
   }
 
-  const handleOpenEditPostDialog = (e: React.MouseEvent<HTMLButtonElement>, post: UserUploadedVideoStatisticsVO) => {
-    setPostEditDialogOpen(true);
-    setSelectedEditingPost(post);
-  }
-
   const calculateDuration = (vo: UserUploadedVideoStatisticsVO) => {
     let duration = 0;
     for (let videoResource of vo.uploadedVideoPostResourceVOS) {
-      if (videoResource.duration){
+      if (videoResource.duration) {
         duration += videoResource.duration;
       }
     }
     return `${Math.floor(duration / 60).toString().padStart(2, '0')}:${Math.floor(duration % 60).toString().padStart(2, '0')}`;
   }
+
+  const handleDeleteVideoPost = () => {
+    if (selectedDeletingPost === null) return;
+
+    videoManagementAPI.deleteVideoPost({ nkid: selectedDeletingPost.nkid }).then(res => {
+      setSelectedDeletingPost(null);
+      videoManagementAPI.getUploadedVideos().then(res => {
+        setUploadedVideos(res.data as UserUploadedVideoStatisticsVO[])
+      })
+    })
+  }
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       <UploadDialog open={uploadDialogOpen} onClose={() => setUploadDialogOpen(false)} />
-      <PostEditDialog open={postEditDialogOpen} onClose={() => setPostEditDialogOpen(false)} post={selectedEditingPost} />
+      {selectedEditingPost !== null && <PostEditDialog open={true} onClose={() => setSelectedEditingPost(null)} post={selectedEditingPost} />}
+      {selectedDeletingPost !== null && <DeleteConfirmDialog open={true} onClose={() => setSelectedDeletingPost(null)} post={selectedDeletingPost} onConfirm={handleDeleteVideoPost} />}
       <Box sx={{ display: 'flex', margin: '32px 32px 8px 32px' }}>
         <Typography sx={{ marginRight: '16px' }} variant='h5' >内容管理</Typography>
         <Button startIcon={<DriveFolderUploadOutlinedIcon />} onClick={() => setUploadDialogOpen(true)}>新建投稿</Button>
@@ -128,8 +136,8 @@ const UploadHome: React.FC = () => {
                         <Typography variant='body2'>{val.title}</Typography>
                         <Typography variant='body2' color='#a0a0a0'>{val.description.length === 0 ? "暂无简介" : val.description}</Typography>
                         <Box sx={{ display: 'flex', flex: '0 0 auto' }}>
-                          <Button variant='outlined' size='small' sx={{ boxShadow: 'unset' }} onClick={e=>handleOpenEditPostDialog(e, val)} >编辑</Button>
-                          <Button variant='outlined' size='small' sx={{ marginLeft: "8px", boxShadow: 'unset' }}>删除</Button>
+                          <Button variant='outlined' size='small' sx={{ boxShadow: 'unset' }} onClick={() => setSelectedEditingPost(val)} >编辑</Button>
+                          <Button variant='outlined' size='small' sx={{ marginLeft: "8px", boxShadow: 'unset' }} onClick={() => setSelectedDeletingPost(val)}>删除</Button>
 
 
                         </Box>
