@@ -11,6 +11,7 @@ export * from './ResponseListPartitionInfo';
 export * from './ResponseListString';
 export * from './ResponseListUserUploadedVideoStatisticsVO';
 export * from './ResponseListVideoPostBriefVO';
+export * from './ResponseObject';
 export * from './ResponseString';
 export * from './ResponseUserUploadedVideoStatisticsVO';
 export * from './ResponseVideoPostBriefVO';

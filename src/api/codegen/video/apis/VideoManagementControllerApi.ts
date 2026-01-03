@@ -16,17 +16,24 @@
 import * as runtime from '../runtime';
 import type {
   ResponseListUserUploadedVideoStatisticsVO,
+  ResponseObject,
   ResponseUserUploadedVideoStatisticsVO,
   UpdatePostBriefDTO,
 } from '../models/index';
 import {
     ResponseListUserUploadedVideoStatisticsVOFromJSON,
     ResponseListUserUploadedVideoStatisticsVOToJSON,
+    ResponseObjectFromJSON,
+    ResponseObjectToJSON,
     ResponseUserUploadedVideoStatisticsVOFromJSON,
     ResponseUserUploadedVideoStatisticsVOToJSON,
     UpdatePostBriefDTOFromJSON,
     UpdatePostBriefDTOToJSON,
 } from '../models/index';
+
+export interface DeleteVideoPostRequest {
+    nkid: number;
+}
 
 export interface GetUploadedVideosRequest {
     page?: number;
@@ -41,6 +48,40 @@ export interface UpdateVideoPostRequest {
  * 
  */
 export class VideoManagementControllerApi extends runtime.BaseAPI {
+
+    /**
+     * 删除已上传的视频
+     */
+    async deleteVideoPostRaw(requestParameters: DeleteVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.nkid === null || requestParameters.nkid === undefined) {
+            throw new runtime.RequiredError('nkid','Required parameter requestParameters.nkid was null or undefined when calling deleteVideoPost.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.nkid !== undefined) {
+            queryParameters['nkid'] = requestParameters.nkid;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/management/deleteVideoPost`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 删除已上传的视频
+     */
+    async deleteVideoPost(requestParameters: DeleteVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.deleteVideoPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * 获取已上传视频列表
