@@ -24,6 +24,7 @@ import { Configuration as DanmakuAPIConfiguration, DanmakuControllerApi } from '
 import { useVideoPostDetailContext } from './context';
 import dynamic from 'next/dynamic';
 import { DanmakuBullet } from '@components/Danmaku/Danmaku';
+import Link from 'next/link';
 
 const NepPlayer = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
 const CustomDanmakuEvent = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
@@ -82,13 +83,7 @@ export default function VideoPage({ }) {
   const partition = '';
 
   // 上传者信息
-  const [uploader, setUploader] = React.useState<UploadUserVO>({
-    userId: 0,
-    username: "用户加载中",
-    sign: "",
-    avatarUrl: "",
-    fans: 0
-  })
+  const [uploader, setUploader] = React.useState<UploadUserVO>(videoPostDetailContext.videoPostDetail.uploader)
 
   // 当前登录用户信息
   const [memberInfo, setMemberInfo] = React.useState({
@@ -112,13 +107,13 @@ export default function VideoPage({ }) {
           return;
         }
         setDanmakus(res.data.map(item => ({
-                    danmaku_id: item.messageId,
-                    content: item.content,
-                    progress: item.progress,
-                    color: item.colorHex,
-                    fired: false,
-                    created_at: item.createdAt,
-                })))
+          danmaku_id: item.messageId,
+          content: item.content,
+          progress: item.progress,
+          color: item.colorHex,
+          fired: false,
+          created_at: item.createdAt,
+        })))
       })
     })
   }, [videoPostDetailContext.nkid])
@@ -228,11 +223,15 @@ export default function VideoPage({ }) {
         <Box sx={{ display: "flex", flexDirection: "column", marginLeft: 2, minWidth: '420px', width: '25%' }}>
           {/* up主信息 */}
           <Box sx={{ margin: "16px 0px", display: "flex", flexDirection: "row", height: "64px" }}>
-            <Avatar src={uploader.avatarUrl} />
+            <Link href={`/space/${uploader.userId}`} passHref target='_blank'>
+              <Avatar src={uploader.avatarUrl} />
+            </Link>
             <Box sx={{ marginLeft: "8px", display: "flex", flexDirection: "column", flexGrow: 1 }}>
-              <Typography sx={{ fontSize: "0.9em" }} variant="h6" component="div" style={{ color: '#ef5350' }}>
-                {uploader.username}
-              </Typography>
+              <Link href={`/space/${uploader.userId}`} passHref target='_blank'>
+                <Typography sx={{ fontSize: "0.9em" }} variant="h6" component="div" style={{ color: '#ef5350' }}>
+                  {uploader.username}
+                </Typography>
+              </Link>
               <Typography sx={{ fontSize: "0.5em", color: "gray" }} variant="body2" component="div">
                 {uploader.sign}
               </Typography>
@@ -265,7 +264,7 @@ export default function VideoPage({ }) {
             </AccordionDetails>
           </Accordion>
           {/* 弹幕面板/聊天面板 */}
-          <DanmakuPanel danmakus={danmakus}/>
+          <DanmakuPanel danmakus={danmakus} />
           {/* 推荐 */}
           <RecommendPanel sx={{ marginTop: 3 }} />
         </Box>
