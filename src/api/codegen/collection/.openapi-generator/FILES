@@ -1,0 +1,12 @@
+apis/CollectionControllerApi.ts
+apis/index.ts
+index.ts
+models/CollectionGroupVO.ts
+models/CollectionVideoPostVO.ts
+models/ResponseBoolean.ts
+models/ResponseCollectionGroupVO.ts
+models/ResponseListCollectionGroupVO.ts
+models/ResponseListCollectionVideoPostVO.ts
+models/ResponseObject.ts
+models/index.ts
+runtime.ts
