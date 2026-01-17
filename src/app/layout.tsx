@@ -7,6 +7,8 @@ import localFont from 'next/font/local';
 
 import { cookies } from 'next/headers'
 import { env } from 'process';
+import { UserDetailContext, UserDetailContextProvider } from '@components/Context/UserDetailContext';
+
 export const metadata = {
   title: 'NekoWindow - 墨云视窗',
   description: 'NekoWindow is a online video website. You can share, watch video and chat on the video with people who are wathing the same video.',
@@ -40,7 +42,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
-            {children}
+            <UserDetailContextProvider>
+              {children}
+            </UserDetailContextProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
