@@ -16,11 +16,24 @@
 import * as runtime from '../runtime';
 import type {
   UpdateVideoResourceConversionStateDTO,
+  VideoPostDTO,
 } from '../models/index';
 import {
     UpdateVideoResourceConversionStateDTOFromJSON,
     UpdateVideoResourceConversionStateDTOToJSON,
+    VideoPostDTOFromJSON,
+    VideoPostDTOToJSON,
 } from '../models/index';
+
+export interface GetVideoPostRequest {
+    nkid: number;
+    viewerUserId: number;
+}
+
+export interface GetVideoPostBatchRequest {
+    nkidList: Array<number>;
+    viewerUserId: number;
+}
 
 export interface UpdateVideoResourceRequest {
     videoId: number;
@@ -35,6 +48,86 @@ export interface UpdateVideoResourceConversionStateRequest {
  * 
  */
 export class VideoInternalControllerApi extends runtime.BaseAPI {
+
+    /**
+     */
+    async getVideoPostRaw(requestParameters: GetVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<VideoPostDTO>> {
+        if (requestParameters.nkid === null || requestParameters.nkid === undefined) {
+            throw new runtime.RequiredError('nkid','Required parameter requestParameters.nkid was null or undefined when calling getVideoPost.');
+        }
+
+        if (requestParameters.viewerUserId === null || requestParameters.viewerUserId === undefined) {
+            throw new runtime.RequiredError('viewerUserId','Required parameter requestParameters.viewerUserId was null or undefined when calling getVideoPost.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.nkid !== undefined) {
+            queryParameters['nkid'] = requestParameters.nkid;
+        }
+
+        if (requestParameters.viewerUserId !== undefined) {
+            queryParameters['viewerUserId'] = requestParameters.viewerUserId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/internal/video/getVideoPost`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => VideoPostDTOFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getVideoPost(requestParameters: GetVideoPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<VideoPostDTO> {
+        const response = await this.getVideoPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getVideoPostBatchRaw(requestParameters: GetVideoPostBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<{ [key: string]: VideoPostDTO; }>> {
+        if (requestParameters.nkidList === null || requestParameters.nkidList === undefined) {
+            throw new runtime.RequiredError('nkidList','Required parameter requestParameters.nkidList was null or undefined when calling getVideoPostBatch.');
+        }
+
+        if (requestParameters.viewerUserId === null || requestParameters.viewerUserId === undefined) {
+            throw new runtime.RequiredError('viewerUserId','Required parameter requestParameters.viewerUserId was null or undefined when calling getVideoPostBatch.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.nkidList) {
+            queryParameters['nkidList'] = requestParameters.nkidList;
+        }
+
+        if (requestParameters.viewerUserId !== undefined) {
+            queryParameters['viewerUserId'] = requestParameters.viewerUserId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/internal/video/getVideoPostBatch`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => runtime.mapValues(jsonValue, VideoPostDTOFromJSON));
+    }
+
+    /**
+     */
+    async getVideoPostBatch(requestParameters: GetVideoPostBatchRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<{ [key: string]: VideoPostDTO; }> {
+        const response = await this.getVideoPostBatchRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * 更新视频资源信息
@@ -61,7 +154,7 @@ export class VideoInternalControllerApi extends runtime.BaseAPI {
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/internal/video/updateVideoResource`,
+            path: `/internal/video/internal/video/updateVideoResource`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

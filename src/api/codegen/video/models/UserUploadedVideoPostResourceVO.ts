@@ -39,6 +39,12 @@ export interface UserUploadedVideoPostResourceVO {
     state?: number;
     /**
      * 
+     * @type {number}
+     * @memberof UserUploadedVideoPostResourceVO
+     */
+    visit?: number;
+    /**
+     * 
      * @type {string}
      * @memberof UserUploadedVideoPostResourceVO
      */
@@ -91,6 +97,7 @@ export function UserUploadedVideoPostResourceVOFromJSONTyped(json: any, ignoreDi
         'videoId': !exists(json, 'videoId') ? undefined : json['videoId'],
         'duration': !exists(json, 'duration') ? undefined : json['duration'],
         'state': !exists(json, 'state') ? undefined : json['state'],
+        'visit': !exists(json, 'visit') ? undefined : json['visit'],
         'reviewFailedReason': !exists(json, 'reviewFailedReason') ? undefined : json['reviewFailedReason'],
         'conversionState': !exists(json, 'conversionState') ? undefined : json['conversionState'],
         'conversionFailedReason': !exists(json, 'conversionFailedReason') ? undefined : json['conversionFailedReason'],
@@ -111,6 +118,7 @@ export function UserUploadedVideoPostResourceVOToJSON(value?: UserUploadedVideoP
         'videoId': value.videoId,
         'duration': value.duration,
         'state': value.state,
+        'visit': value.visit,
         'reviewFailedReason': value.reviewFailedReason,
         'conversionState': value.conversionState,
         'conversionFailedReason': value.conversionFailedReason,

@@ -52,6 +52,12 @@ export interface VideoPostBriefVO {
     coverUrl: string;
     /**
      * 
+     * @type {number}
+     * @memberof VideoPostBriefVO
+     */
+    visit: number;
+    /**
+     * 
      * @type {UploadUserVO}
      * @memberof VideoPostBriefVO
      */
@@ -70,6 +76,18 @@ export interface VideoPostBriefVO {
     duration: number;
     /**
      * 
+     * @type {string}
+     * @memberof VideoPostBriefVO
+     */
+    partitionName: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostBriefVO
+     */
+    partitionId: number;
+    /**
+     * 
      * @type {Date}
      * @memberof VideoPostBriefVO
      */
@@ -85,9 +103,12 @@ export function instanceOfVideoPostBriefVO(value: object): boolean {
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "coverUrl" in value;
+    isInstance = isInstance && "visit" in value;
     isInstance = isInstance && "uploader" in value;
     isInstance = isInstance && "tags" in value;
     isInstance = isInstance && "duration" in value;
+    isInstance = isInstance && "partitionName" in value;
+    isInstance = isInstance && "partitionId" in value;
     isInstance = isInstance && "createdAt" in value;
 
     return isInstance;
@@ -107,9 +128,12 @@ export function VideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: bo
         'title': json['title'],
         'description': json['description'],
         'coverUrl': json['coverUrl'],
+        'visit': json['visit'],
         'uploader': UploadUserVOFromJSON(json['uploader']),
         'tags': json['tags'],
         'duration': json['duration'],
+        'partitionName': json['partitionName'],
+        'partitionId': json['partitionId'],
         'createdAt': (new Date(json['createdAt'])),
     };
 }
@@ -127,9 +151,12 @@ export function VideoPostBriefVOToJSON(value?: VideoPostBriefVO | null): any {
         'title': value.title,
         'description': value.description,
         'coverUrl': value.coverUrl,
+        'visit': value.visit,
         'uploader': UploadUserVOToJSON(value.uploader),
         'tags': value.tags,
         'duration': value.duration,
+        'partitionName': value.partitionName,
+        'partitionId': value.partitionId,
         'createdAt': (value.createdAt.toISOString()),
     };
 }

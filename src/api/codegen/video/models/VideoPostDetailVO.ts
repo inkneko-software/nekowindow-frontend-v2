@@ -58,6 +58,18 @@ export interface VideoPostDetailVO {
     coverUrl: string;
     /**
      * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    duration: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    visit: number;
+    /**
+     * 
      * @type {UploadUserVO}
      * @memberof VideoPostDetailVO
      */
@@ -76,6 +88,18 @@ export interface VideoPostDetailVO {
     tags: Array<string>;
     /**
      * 
+     * @type {string}
+     * @memberof VideoPostDetailVO
+     */
+    partitionName: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    partitionId: number;
+    /**
+     * 
      * @type {Date}
      * @memberof VideoPostDetailVO
      */
@@ -91,9 +115,13 @@ export function instanceOfVideoPostDetailVO(value: object): boolean {
     isInstance = isInstance && "title" in value;
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "coverUrl" in value;
+    isInstance = isInstance && "duration" in value;
+    isInstance = isInstance && "visit" in value;
     isInstance = isInstance && "uploader" in value;
     isInstance = isInstance && "videos" in value;
     isInstance = isInstance && "tags" in value;
+    isInstance = isInstance && "partitionName" in value;
+    isInstance = isInstance && "partitionId" in value;
     isInstance = isInstance && "createdAt" in value;
 
     return isInstance;
@@ -113,9 +141,13 @@ export function VideoPostDetailVOFromJSONTyped(json: any, ignoreDiscriminator: b
         'title': json['title'],
         'description': json['description'],
         'coverUrl': json['coverUrl'],
+        'duration': json['duration'],
+        'visit': json['visit'],
         'uploader': UploadUserVOFromJSON(json['uploader']),
         'videos': ((json['videos'] as Array<any>).map(VideoPostResourceVOFromJSON)),
         'tags': json['tags'],
+        'partitionName': json['partitionName'],
+        'partitionId': json['partitionId'],
         'createdAt': (new Date(json['createdAt'])),
     };
 }
@@ -133,9 +165,13 @@ export function VideoPostDetailVOToJSON(value?: VideoPostDetailVO | null): any {
         'title': value.title,
         'description': value.description,
         'coverUrl': value.coverUrl,
+        'duration': value.duration,
+        'visit': value.visit,
         'uploader': UploadUserVOToJSON(value.uploader),
         'videos': ((value.videos as Array<any>).map(VideoPostResourceVOToJSON)),
         'tags': value.tags,
+        'partitionName': value.partitionName,
+        'partitionId': value.partitionId,
         'createdAt': (value.createdAt.toISOString()),
     };
 }

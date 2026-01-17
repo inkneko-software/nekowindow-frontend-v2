@@ -25,6 +25,7 @@ models/UploadUserVO.ts
 models/UserUploadedVideoPostResourceVO.ts
 models/UserUploadedVideoStatisticsVO.ts
 models/VideoPostBriefVO.ts
+models/VideoPostDTO.ts
 models/VideoPostDetailVO.ts
 models/VideoPostResourceVO.ts
 models/index.ts

@@ -21,6 +21,7 @@ import type {
   ResponseListPartitionInfo,
   ResponseListString,
   ResponseListVideoPostBriefVO,
+  ResponseObject,
   ResponseString,
   ResponseVideoPostBriefVO,
   ResponseVideoPostDetailVO,
@@ -38,6 +39,8 @@ import {
     ResponseListStringToJSON,
     ResponseListVideoPostBriefVOFromJSON,
     ResponseListVideoPostBriefVOToJSON,
+    ResponseObjectFromJSON,
+    ResponseObjectToJSON,
     ResponseStringFromJSON,
     ResponseStringToJSON,
     ResponseVideoPostBriefVOFromJSON,
@@ -72,6 +75,10 @@ export interface GetVideoPostBriefRequest {
 
 export interface GetVideoPostDetailRequest {
     nkid: number;
+}
+
+export interface LogMetricsRequest {
+    videoId: number;
 }
 
 /**
@@ -403,6 +410,40 @@ export class VideoControllerApi extends runtime.BaseAPI {
      */
     async getVideoPostDetail(requestParameters: GetVideoPostDetailRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseVideoPostDetailVO> {
         const response = await this.getVideoPostDetailRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 视频播放记录
+     */
+    async logMetricsRaw(requestParameters: LogMetricsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.videoId === null || requestParameters.videoId === undefined) {
+            throw new runtime.RequiredError('videoId','Required parameter requestParameters.videoId was null or undefined when calling logMetrics.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.videoId !== undefined) {
+            queryParameters['videoId'] = requestParameters.videoId;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/v1/video/logMetrics`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 视频播放记录
+     */
+    async logMetrics(requestParameters: LogMetricsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.logMetricsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

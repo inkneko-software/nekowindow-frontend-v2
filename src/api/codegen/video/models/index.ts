@@ -22,5 +22,6 @@ export * from './UploadUserVO';
 export * from './UserUploadedVideoPostResourceVO';
 export * from './UserUploadedVideoStatisticsVO';
 export * from './VideoPostBriefVO';
+export * from './VideoPostDTO';
 export * from './VideoPostDetailVO';
 export * from './VideoPostResourceVO';
