@@ -183,7 +183,7 @@ export default function VideoPage({ }) {
           {/* 弹幕控制面板 */}
           <Paper sx={{ display: "flex", padding: "8px 8px", borderRadius: "0", height: "40px"  }} elevation={2}>
             <Typography sx={{ margin: 'auto 0' }} variant="body2">1人正在看,已装填500条弹幕</Typography>
-            <FormControlLabel control={<Switch />} label="弹幕" sx={{ marginLeft: 10, fontSize: "2px" }} />
+            <FormControlLabel control={<Switch defaultChecked />} label="弹幕" sx={{ marginLeft: 10, fontSize: "2px" }} />
             <Paper sx={{ flexGrow: 1, display: "flex", margin: "5px", bgcolor: "#eeeeee" }} elevation={0}>
               <IconButton><FormatColorTextRoundedIcon /></IconButton>
               <InputBase id='danmaku-input' sx={{ flexGrow: 1, fontSize: '12px' }} placeholder="装填弹幕~"   onKeyUp={handleDanmakuInputKeyUp} ></InputBase>
@@ -215,7 +215,7 @@ export default function VideoPage({ }) {
           {/* comment area */}
           <Box sx={{ display: 'flex' }}>
             <SocialSection>
-              <CommentPanel face_url={memberInfo.face_url} nick={memberInfo.nick} vid={video.videoId} nkid={post.nkid} />
+              <CommentPanel objectId={nkid} idType='VIDEO'/>
             </SocialSection>
             {/* <RecommentPannel/> */}
           </Box>
