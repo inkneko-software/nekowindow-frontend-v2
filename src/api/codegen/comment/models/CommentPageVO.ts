@@ -31,25 +31,25 @@ export interface CommentPageVO {
      * @type {number}
      * @memberof CommentPageVO
      */
-    total?: number;
+    total: number;
     /**
      * 
      * @type {number}
      * @memberof CommentPageVO
      */
-    page?: number;
+    page: number;
     /**
      * 
      * @type {number}
      * @memberof CommentPageVO
      */
-    size?: number;
+    size: number;
     /**
      * 
      * @type {Array<CommentVO>}
      * @memberof CommentPageVO
      */
-    comments?: Array<CommentVO>;
+    comments: Array<CommentVO>;
 }
 
 /**
@@ -57,6 +57,10 @@ export interface CommentPageVO {
  */
 export function instanceOfCommentPageVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "total" in value;
+    isInstance = isInstance && "page" in value;
+    isInstance = isInstance && "size" in value;
+    isInstance = isInstance && "comments" in value;
 
     return isInstance;
 }
@@ -71,10 +75,10 @@ export function CommentPageVOFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'total': !exists(json, 'total') ? undefined : json['total'],
-        'page': !exists(json, 'page') ? undefined : json['page'],
-        'size': !exists(json, 'size') ? undefined : json['size'],
-        'comments': !exists(json, 'comments') ? undefined : ((json['comments'] as Array<any>).map(CommentVOFromJSON)),
+        'total': json['total'],
+        'page': json['page'],
+        'size': json['size'],
+        'comments': ((json['comments'] as Array<any>).map(CommentVOFromJSON)),
     };
 }
 
@@ -90,7 +94,7 @@ export function CommentPageVOToJSON(value?: CommentPageVO | null): any {
         'total': value.total,
         'page': value.page,
         'size': value.size,
-        'comments': value.comments === undefined ? undefined : ((value.comments as Array<any>).map(CommentVOToJSON)),
+        'comments': ((value.comments as Array<any>).map(CommentVOToJSON)),
     };
 }
 

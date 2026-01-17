@@ -37,49 +37,49 @@ export interface CommentVO {
      * @type {number}
      * @memberof CommentVO
      */
-    commentId?: number;
+    commentId: number;
     /**
      * 
      * @type {CommentUserVO}
      * @memberof CommentVO
      */
-    commentUserVO?: CommentUserVO;
+    commentUserVO: CommentUserVO;
     /**
      * 
      * @type {number}
      * @memberof CommentVO
      */
-    oid?: number;
+    oid: number;
     /**
      * 
      * @type {string}
      * @memberof CommentVO
      */
-    oidType?: CommentVOOidTypeEnum;
+    oidType: CommentVOOidTypeEnum;
     /**
      * 
      * @type {string}
      * @memberof CommentVO
      */
-    content?: string;
+    content: string;
     /**
      * 
      * @type {number}
      * @memberof CommentVO
      */
-    likesCount?: number;
+    likesCount: number;
     /**
      * 
      * @type {SecondaryCommentPageVO}
      * @memberof CommentVO
      */
-    initialSecondaryCommentPageVO?: SecondaryCommentPageVO;
+    initialSecondaryCommentPageVO: SecondaryCommentPageVO;
     /**
      * 
      * @type {Date}
      * @memberof CommentVO
      */
-    createdAt?: Date;
+    createdAt: Date;
 }
 
 
@@ -98,6 +98,14 @@ export type CommentVOOidTypeEnum = typeof CommentVOOidTypeEnum[keyof typeof Comm
  */
 export function instanceOfCommentVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "commentId" in value;
+    isInstance = isInstance && "commentUserVO" in value;
+    isInstance = isInstance && "oid" in value;
+    isInstance = isInstance && "oidType" in value;
+    isInstance = isInstance && "content" in value;
+    isInstance = isInstance && "likesCount" in value;
+    isInstance = isInstance && "initialSecondaryCommentPageVO" in value;
+    isInstance = isInstance && "createdAt" in value;
 
     return isInstance;
 }
@@ -112,14 +120,14 @@ export function CommentVOFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     }
     return {
         
-        'commentId': !exists(json, 'commentId') ? undefined : json['commentId'],
-        'commentUserVO': !exists(json, 'commentUserVO') ? undefined : CommentUserVOFromJSON(json['commentUserVO']),
-        'oid': !exists(json, 'oid') ? undefined : json['oid'],
-        'oidType': !exists(json, 'oidType') ? undefined : json['oidType'],
-        'content': !exists(json, 'content') ? undefined : json['content'],
-        'likesCount': !exists(json, 'likesCount') ? undefined : json['likesCount'],
-        'initialSecondaryCommentPageVO': !exists(json, 'initialSecondaryCommentPageVO') ? undefined : SecondaryCommentPageVOFromJSON(json['initialSecondaryCommentPageVO']),
-        'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
+        'commentId': json['commentId'],
+        'commentUserVO': CommentUserVOFromJSON(json['commentUserVO']),
+        'oid': json['oid'],
+        'oidType': json['oidType'],
+        'content': json['content'],
+        'likesCount': json['likesCount'],
+        'initialSecondaryCommentPageVO': SecondaryCommentPageVOFromJSON(json['initialSecondaryCommentPageVO']),
+        'createdAt': (new Date(json['createdAt'])),
     };
 }
 
@@ -139,7 +147,7 @@ export function CommentVOToJSON(value?: CommentVO | null): any {
         'content': value.content,
         'likesCount': value.likesCount,
         'initialSecondaryCommentPageVO': SecondaryCommentPageVOToJSON(value.initialSecondaryCommentPageVO),
-        'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
+        'createdAt': (value.createdAt.toISOString()),
     };
 }
 

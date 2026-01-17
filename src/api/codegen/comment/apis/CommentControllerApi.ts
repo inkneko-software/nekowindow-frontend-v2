@@ -15,20 +15,23 @@
 
 import * as runtime from '../runtime';
 import type {
-  CommentPageVO,
-  CommentVO,
   CreateCommentDTO,
-  SecondaryCommentPageVO,
+  ResponseCommentPageVO,
+  ResponseCommentVO,
+  ResponseObject,
+  ResponseSecondaryCommentPageVO,
 } from '../models/index';
 import {
-    CommentPageVOFromJSON,
-    CommentPageVOToJSON,
-    CommentVOFromJSON,
-    CommentVOToJSON,
     CreateCommentDTOFromJSON,
     CreateCommentDTOToJSON,
-    SecondaryCommentPageVOFromJSON,
-    SecondaryCommentPageVOToJSON,
+    ResponseCommentPageVOFromJSON,
+    ResponseCommentPageVOToJSON,
+    ResponseCommentVOFromJSON,
+    ResponseCommentVOToJSON,
+    ResponseObjectFromJSON,
+    ResponseObjectToJSON,
+    ResponseSecondaryCommentPageVOFromJSON,
+    ResponseSecondaryCommentPageVOToJSON,
 } from '../models/index';
 
 export interface AddCommentRequest {
@@ -68,7 +71,7 @@ export class CommentControllerApi extends runtime.BaseAPI {
     /**
      * 添加评论
      */
-    async addCommentRaw(requestParameters: AddCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentVO>> {
+    async addCommentRaw(requestParameters: AddCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseCommentVO>> {
         if (requestParameters.createCommentDTO === null || requestParameters.createCommentDTO === undefined) {
             throw new runtime.RequiredError('createCommentDTO','Required parameter requestParameters.createCommentDTO was null or undefined when calling addComment.');
         }
@@ -87,13 +90,13 @@ export class CommentControllerApi extends runtime.BaseAPI {
             body: CreateCommentDTOToJSON(requestParameters.createCommentDTO),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentVOFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseCommentVOFromJSON(jsonValue));
     }
 
     /**
      * 添加评论
      */
-    async addComment(requestParameters: AddCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentVO> {
+    async addComment(requestParameters: AddCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseCommentVO> {
         const response = await this.addCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -101,7 +104,7 @@ export class CommentControllerApi extends runtime.BaseAPI {
     /**
      * 删除评论
      */
-    async deleteCommentRaw(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async deleteCommentRaw(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
             throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling deleteComment.');
         }
@@ -121,20 +124,21 @@ export class CommentControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
     }
 
     /**
      * 删除评论
      */
-    async deleteComment(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.deleteCommentRaw(requestParameters, initOverrides);
+    async deleteComment(requestParameters: DeleteCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.deleteCommentRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      * 获取对象ID的评论列表
      */
-    async getCommentRaw(requestParameters: GetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CommentPageVO>> {
+    async getCommentRaw(requestParameters: GetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseCommentPageVO>> {
         if (requestParameters.objectId === null || requestParameters.objectId === undefined) {
             throw new runtime.RequiredError('objectId','Required parameter requestParameters.objectId was null or undefined when calling getComment.');
         }
@@ -170,13 +174,13 @@ export class CommentControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => CommentPageVOFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseCommentPageVOFromJSON(jsonValue));
     }
 
     /**
      * 获取对象ID的评论列表
      */
-    async getComment(requestParameters: GetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CommentPageVO> {
+    async getComment(requestParameters: GetCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseCommentPageVO> {
         const response = await this.getCommentRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -184,7 +188,7 @@ export class CommentControllerApi extends runtime.BaseAPI {
     /**
      * 获取根评论的回复评论列表
      */
-    async getReplyCommentsRaw(requestParameters: GetReplyCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SecondaryCommentPageVO>> {
+    async getReplyCommentsRaw(requestParameters: GetReplyCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseSecondaryCommentPageVO>> {
         if (requestParameters.rootCommentId === null || requestParameters.rootCommentId === undefined) {
             throw new runtime.RequiredError('rootCommentId','Required parameter requestParameters.rootCommentId was null or undefined when calling getReplyComments.');
         }
@@ -212,13 +216,13 @@ export class CommentControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SecondaryCommentPageVOFromJSON(jsonValue));
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseSecondaryCommentPageVOFromJSON(jsonValue));
     }
 
     /**
      * 获取根评论的回复评论列表
      */
-    async getReplyComments(requestParameters: GetReplyCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SecondaryCommentPageVO> {
+    async getReplyComments(requestParameters: GetReplyCommentsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseSecondaryCommentPageVO> {
         const response = await this.getReplyCommentsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -226,7 +230,7 @@ export class CommentControllerApi extends runtime.BaseAPI {
     /**
      * 点赞评论
      */
-    async likeCommentRaw(requestParameters: LikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async likeCommentRaw(requestParameters: LikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
             throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling likeComment.');
         }
@@ -246,20 +250,21 @@ export class CommentControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
     }
 
     /**
      * 点赞评论
      */
-    async likeComment(requestParameters: LikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.likeCommentRaw(requestParameters, initOverrides);
+    async likeComment(requestParameters: LikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.likeCommentRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
     /**
      * 取消点赞评论
      */
-    async unlikeCommentRaw(requestParameters: UnlikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async unlikeCommentRaw(requestParameters: UnlikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
         if (requestParameters.commentId === null || requestParameters.commentId === undefined) {
             throw new runtime.RequiredError('commentId','Required parameter requestParameters.commentId was null or undefined when calling unlikeComment.');
         }
@@ -279,14 +284,15 @@ export class CommentControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.VoidApiResponse(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
     }
 
     /**
      * 取消点赞评论
      */
-    async unlikeComment(requestParameters: UnlikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.unlikeCommentRaw(requestParameters, initOverrides);
+    async unlikeComment(requestParameters: UnlikeCommentRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.unlikeCommentRaw(requestParameters, initOverrides);
+        return await response.value();
     }
 
 }

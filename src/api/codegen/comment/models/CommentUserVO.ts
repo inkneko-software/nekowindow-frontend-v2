@@ -24,19 +24,19 @@ export interface CommentUserVO {
      * @type {number}
      * @memberof CommentUserVO
      */
-    uid?: number;
+    uid: number;
     /**
      * 
      * @type {string}
      * @memberof CommentUserVO
      */
-    username?: string;
+    username: string;
     /**
      * 
      * @type {string}
      * @memberof CommentUserVO
      */
-    avatarUrl?: string;
+    avatarUrl: string;
 }
 
 /**
@@ -44,6 +44,9 @@ export interface CommentUserVO {
  */
 export function instanceOfCommentUserVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "uid" in value;
+    isInstance = isInstance && "username" in value;
+    isInstance = isInstance && "avatarUrl" in value;
 
     return isInstance;
 }
@@ -58,9 +61,9 @@ export function CommentUserVOFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'uid': !exists(json, 'uid') ? undefined : json['uid'],
-        'username': !exists(json, 'username') ? undefined : json['username'],
-        'avatarUrl': !exists(json, 'avatarUrl') ? undefined : json['avatarUrl'],
+        'uid': json['uid'],
+        'username': json['username'],
+        'avatarUrl': json['avatarUrl'],
     };
 }
 

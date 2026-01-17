@@ -31,25 +31,25 @@ export interface SecondaryCommentPageVO {
      * @type {number}
      * @memberof SecondaryCommentPageVO
      */
-    total?: number;
+    total: number;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentPageVO
      */
-    page?: number;
+    page: number;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentPageVO
      */
-    size?: number;
+    size: number;
     /**
      * 
      * @type {Array<SecondaryCommentVO>}
      * @memberof SecondaryCommentPageVO
      */
-    secondaryComments?: Array<SecondaryCommentVO>;
+    secondaryComments: Array<SecondaryCommentVO>;
 }
 
 /**
@@ -57,6 +57,10 @@ export interface SecondaryCommentPageVO {
  */
 export function instanceOfSecondaryCommentPageVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "total" in value;
+    isInstance = isInstance && "page" in value;
+    isInstance = isInstance && "size" in value;
+    isInstance = isInstance && "secondaryComments" in value;
 
     return isInstance;
 }
@@ -71,10 +75,10 @@ export function SecondaryCommentPageVOFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
-        'total': !exists(json, 'total') ? undefined : json['total'],
-        'page': !exists(json, 'page') ? undefined : json['page'],
-        'size': !exists(json, 'size') ? undefined : json['size'],
-        'secondaryComments': !exists(json, 'secondaryComments') ? undefined : ((json['secondaryComments'] as Array<any>).map(SecondaryCommentVOFromJSON)),
+        'total': json['total'],
+        'page': json['page'],
+        'size': json['size'],
+        'secondaryComments': ((json['secondaryComments'] as Array<any>).map(SecondaryCommentVOFromJSON)),
     };
 }
 
@@ -90,7 +94,7 @@ export function SecondaryCommentPageVOToJSON(value?: SecondaryCommentPageVO | nu
         'total': value.total,
         'page': value.page,
         'size': value.size,
-        'secondaryComments': value.secondaryComments === undefined ? undefined : ((value.secondaryComments as Array<any>).map(SecondaryCommentVOToJSON)),
+        'secondaryComments': ((value.secondaryComments as Array<any>).map(SecondaryCommentVOToJSON)),
     };
 }
 

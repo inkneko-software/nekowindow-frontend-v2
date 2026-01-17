@@ -31,55 +31,55 @@ export interface SecondaryCommentVO {
      * @type {number}
      * @memberof SecondaryCommentVO
      */
-    commentId?: number;
+    commentId: number;
     /**
      * 
      * @type {CommentUserVO}
      * @memberof SecondaryCommentVO
      */
-    commentUserVO?: CommentUserVO;
+    commentUserVO: CommentUserVO;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentVO
      */
-    oid?: number;
+    oid: number;
     /**
      * 
      * @type {string}
      * @memberof SecondaryCommentVO
      */
-    oidType?: SecondaryCommentVOOidTypeEnum;
+    oidType: SecondaryCommentVOOidTypeEnum;
     /**
      * 
      * @type {string}
      * @memberof SecondaryCommentVO
      */
-    content?: string;
+    content: string;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentVO
      */
-    likesCount?: number;
+    likesCount: number;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentVO
      */
-    replyCid?: number;
+    replyCid: number;
     /**
      * 
      * @type {number}
      * @memberof SecondaryCommentVO
      */
-    replySecondaryCid?: number;
+    replySecondaryCid: number;
     /**
      * 
      * @type {Date}
      * @memberof SecondaryCommentVO
      */
-    createdAt?: Date;
+    createdAt: Date;
 }
 
 
@@ -98,6 +98,15 @@ export type SecondaryCommentVOOidTypeEnum = typeof SecondaryCommentVOOidTypeEnum
  */
 export function instanceOfSecondaryCommentVO(value: object): boolean {
     let isInstance = true;
+    isInstance = isInstance && "commentId" in value;
+    isInstance = isInstance && "commentUserVO" in value;
+    isInstance = isInstance && "oid" in value;
+    isInstance = isInstance && "oidType" in value;
+    isInstance = isInstance && "content" in value;
+    isInstance = isInstance && "likesCount" in value;
+    isInstance = isInstance && "replyCid" in value;
+    isInstance = isInstance && "replySecondaryCid" in value;
+    isInstance = isInstance && "createdAt" in value;
 
     return isInstance;
 }
@@ -112,15 +121,15 @@ export function SecondaryCommentVOFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'commentId': !exists(json, 'commentId') ? undefined : json['commentId'],
-        'commentUserVO': !exists(json, 'commentUserVO') ? undefined : CommentUserVOFromJSON(json['commentUserVO']),
-        'oid': !exists(json, 'oid') ? undefined : json['oid'],
-        'oidType': !exists(json, 'oidType') ? undefined : json['oidType'],
-        'content': !exists(json, 'content') ? undefined : json['content'],
-        'likesCount': !exists(json, 'likesCount') ? undefined : json['likesCount'],
-        'replyCid': !exists(json, 'replyCid') ? undefined : json['replyCid'],
-        'replySecondaryCid': !exists(json, 'replySecondaryCid') ? undefined : json['replySecondaryCid'],
-        'createdAt': !exists(json, 'createdAt') ? undefined : (new Date(json['createdAt'])),
+        'commentId': json['commentId'],
+        'commentUserVO': CommentUserVOFromJSON(json['commentUserVO']),
+        'oid': json['oid'],
+        'oidType': json['oidType'],
+        'content': json['content'],
+        'likesCount': json['likesCount'],
+        'replyCid': json['replyCid'],
+        'replySecondaryCid': json['replySecondaryCid'],
+        'createdAt': (new Date(json['createdAt'])),
     };
 }
 
@@ -141,7 +150,7 @@ export function SecondaryCommentVOToJSON(value?: SecondaryCommentVO | null): any
         'likesCount': value.likesCount,
         'replyCid': value.replyCid,
         'replySecondaryCid': value.replySecondaryCid,
-        'createdAt': value.createdAt === undefined ? undefined : (value.createdAt.toISOString()),
+        'createdAt': (value.createdAt.toISOString()),
     };
 }
 
