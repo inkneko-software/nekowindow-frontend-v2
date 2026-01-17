@@ -33,6 +33,7 @@ import { Popper, Paper, Fade, Stack } from '@mui/material';
 import theme from '@theme/theme';
 import { Configuration, UserControllerApi, UserDetailVO } from '@api/codegen/user';
 import LoginDialog from '@components/LoginDialog/LoginDialog';
+import { useUserDetailContext } from '@components/Context/UserDetailContext';
 
 
 interface INavigationButton {
@@ -104,6 +105,7 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
     const [historyPopperOpen, setHistoryPopperOpen] = useState(false)
     const [atTop, setAtTop] = useState(true);
     const messageButtonRef = useRef<HTMLElement>(null);
+    const userDetailContext = useUserDetailContext();
 
 
     useEffect(() => {
@@ -118,11 +120,14 @@ const NekoWindowAppBar: React.FC<INekoWindowAppBar> = ({ transparent }) => {
 
         userapi.myUserDetail()
             .then(res => {
-                if (res.code !== 0) {
+                if (res.code !== 0 || res.data === null || res.data === undefined) {
                     setUserInfo(null);
                     return;
                 }
                 setUserInfo(res.data)
+                if (userDetailContext !== null){
+                    userDetailContext.handleUserDetailChanged(res.data)
+                }
             })
             .catch()
 
