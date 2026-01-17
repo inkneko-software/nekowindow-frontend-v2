@@ -79,7 +79,7 @@ export default function VideoPage({ }) {
   //这几个数据后续应该单独获取，从Layout中传递过来
   const danmaku = 0
   const comment = 0;
-  const visit = 0;
+  const visit = post.visit;
   const partition = '';
 
   // 上传者信息
@@ -116,6 +116,8 @@ export default function VideoPage({ }) {
         })))
       })
     })
+
+    videoapi.logMetrics({videoId: post.videos[0].videoId});
   }, [videoPostDetailContext.nkid])
 
   const handleSendDanmaku = () => {

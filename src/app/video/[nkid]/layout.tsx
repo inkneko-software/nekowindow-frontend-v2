@@ -4,7 +4,7 @@ import { VideoControllerApi, Configuration } from "@api/codegen/video";
 export default async function VideoLayout({ children, params }: { children: React.ReactNode, params: { nkid: number } }) {
     const videoapi = new VideoControllerApi(new Configuration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
 
-    const resp = await (videoapi.getVideoPostDetail({ nkid: params.nkid }));
+    const resp = await (videoapi.getVideoPostDetail({ nkid: params.nkid }, {cache: 'no-cache'}));
     if (resp.code !== 0 || resp.data === undefined) {
         return <div>视频不存在</div>;
     }
