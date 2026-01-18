@@ -145,7 +145,7 @@ const UploadHome: React.FC = () => {
                       <Box sx={{ marginLeft: "8px", display: 'flex', flexDirection: 'column' }}>
                         <Typography variant='caption' >{`共${val.uploadedVideoPostResourceVOS.length}个视频`}</Typography>
                         <Typography variant='caption' >{calculateTranscodeProgress(val)}</Typography>
-                        <Typography variant='caption' >审核中</Typography>
+                        <Typography variant='caption' >{val.state === 0 ? '公开' : val.state === 3 ? '审核中' : val.state === 5 ? '非公开' : val.state}</Typography>
                       </Box>
                     </TableCell>
                     <TableCell >公开范围</TableCell>
