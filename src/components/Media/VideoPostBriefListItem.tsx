@@ -64,7 +64,8 @@ export default function VideoPostBriefListItem(props: VideoPostBriefListItemProp
                         minWidth: "192px",
                         height: '96px',
                         backgroundImage: `url(${post.archive_url})`,
-                        backgroundSize: 'cover'
+                        backgroundSize: 'cover',
+                        backgroundPosition: "center",
                     }}
                 >
                     {/* <Box
