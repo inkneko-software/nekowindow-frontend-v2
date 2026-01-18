@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { Suspense } from 'react';
 import NekoWindowAppBar from '@components/AppBar/NekoWindowAppBar';
 import { Box, Container, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from '@mui/material';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
@@ -78,7 +78,9 @@ const PostsLayout = ({ children }: { children: React.ReactNode }) => {
                         </List>
                     </List>
                     <Box sx={{ flex: '1 0 auto' }}>
-                        {children}
+                        <Suspense fallback={null}>
+                            {children}
+                        </Suspense>
                     </Box>
                 </Box>
 
