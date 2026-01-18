@@ -189,7 +189,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
       dashMediaPlayer.updateSettings(cfg);
 
       let defaultAdaptionId = adaptions.length - 1;
-      console.log("initial adaption id: " ,defaultAdaptionId)
       setCurrentAdaptionId(adaptions[adaptions.length - defaultAdaptionId - 1].adaptionId);
 
       dashMediaPlayer.initialize(videoRef.current, src, true);
@@ -246,7 +245,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
           var currentRep = adaptation.Representation_asArray.find(function (rep: any) {
             return rep.id === videoRepSwitch.to
           })
-          console.log(currentRep)
           var frameRate = currentRep.frameRate;
           var resolution = currentRep.width + 'x' + currentRep.height;
           //frameRate fix for situation like 24000/1001 = 23.xxxx fps
@@ -409,6 +407,14 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
     }
   }, [danmakuEngine, currentTime])
 
+  React.useEffect(() => { 
+    if (danmakuEngine === undefined || danmakus === undefined) {
+      return;
+    }
+
+    danmakuEngine.loadDanmakus(danmakus)
+  }, [danmakuEngine, danmakus])
+
   const videoClick = () => {
   }
 
@@ -444,7 +450,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
   }
 
   const handleAdaptionChange = (adaptionId: number) => {
-    console.log("更换清晰度", adaptionId)
     //默认配置为自动选择视频码率
     var cfg = {
       'streaming': {
@@ -472,7 +477,6 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
     cfg.streaming.abr.autoSwitchBitrate['video'] = false;
     dashPlayer.updateSettings(cfg);
     dashPlayer.setQualityFor("video", selectedAdaptionIndex, false);
-    console.log("切换清晰度", selectedAdaptionIndex)
     setCurrentAdaptionId(adaptionId);
     // cfg.streaming.abr.autoSwitchBitrate[item.mediaType] = true;
     // self.player.updateSettings(cfg);
@@ -537,13 +541,12 @@ const NepPlayer: React.FC<NepPlayerProps> = ({ src, title, adaptions,danmakus })
   }
   
   const sxWindowFullscreen = {
-  
   }
 
   return (
     <Box id='nep-player-wrap' sx={[{ width: '100%', height: '100%', position: 'relative', backgroundColor: 'black', cursor: `${isBriefMode ? 'none' : 'unset'}` }, (fullscreen === "normal" ? {} : (fullscreen === "browser" ? sxBrowserFullscreen : sxWindowFullscreen))]} >
       {/* video标签 */}
-      <Box component='video' id="nep-player-video" sx={{ width: '100%' }} ref={videoRef} />
+      <Box component='video' id="nep-player-video" sx={{ width: '100%', height: '100%', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} ref={videoRef} />
       <Box id="nep-player-danmaku" sx={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} onClick={() => {
         //弹幕界面实际上是覆盖在video上的，所以点击弹幕界面实际上是点击video，需要传递点击事件
         if (videoRef.current !== undefined) {
