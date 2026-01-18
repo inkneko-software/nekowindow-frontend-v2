@@ -102,19 +102,19 @@ const UploadHome: React.FC = () => {
         <Tab label='课程' />
       </Tabs>
       <TableContainer>
-        <Table>
+        <Table sx={{ tableLayout: 'fixed' }}>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ paddingLeft: '32px' }} width='35%'>稿件</TableCell>
-              <TableCell>状态</TableCell>
-              <TableCell>公开范围</TableCell>
-              <TableCell>日期</TableCell>
-              <TableCell >观看次数</TableCell>
-              <TableCell >评论数</TableCell>
-              <TableCell >弹幕数</TableCell>
-              <TableCell >硬币数</TableCell>
-              <TableCell >收藏量</TableCell>
-              <TableCell >赞与不喜欢的比例</TableCell>
+              <TableCell width="35%">稿件</TableCell>
+              <TableCell width="10%">状态</TableCell>
+              <TableCell width="8%">公开范围</TableCell>
+              <TableCell width="10%">日期</TableCell>
+              <TableCell width="7%">观看</TableCell>
+              <TableCell width="7%">评论</TableCell>
+              <TableCell width="7%">弹幕</TableCell>
+              <TableCell width="6%">硬币</TableCell>
+              <TableCell width="6%">收藏</TableCell>
+              <TableCell width="10%">赞比</TableCell>
             </TableRow>
 
           </TableHead>
@@ -126,20 +126,18 @@ const UploadHome: React.FC = () => {
                     <TableCell sx={{ paddingLeft: '32px', display: 'flex' }}>
                       {/* 视频封面 */}
                       <Box component='a' href={`/video/${val.nkid}`} target='_blank' sx={{ position: 'relative', minWidth: '127px', minHeight: '72px', width: '127px', height: '72px', borderRadius: '8%', overflow: 'hidden', border: '1px #e3e3e3 solid' }}>
-                        <Box component='img' sx={{ width: '100%', height: '100%', positoin: 'absolute' }} src={val.coverUrl} />
+                        <Box component='img' sx={{ width: '100%', height: '100%' }} src={val.coverUrl} />
                         <Box sx={{ borderRadius: '16%', position: 'absolute', bottom: 0, right: '4px', overflow: 'hidden' }}>
                           <Typography sx={{ backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '2px 4px' }} variant='caption'>{calculateDuration(val)}</Typography>
                         </Box>
                       </Box>
                       {/* 视频标题与说明 */}
-                      <Box sx={{ display: 'flex', flexDirection: 'column', marginLeft: '16px', justifyContent: 'space-evenly' }}>
-                        <Typography variant='body2'>{val.title}</Typography>
-                        <Typography variant='body2' color='#a0a0a0'>{val.description.length === 0 ? "暂无简介" : val.description}</Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', marginLeft: '16px', justifyContent: 'space-evenly', maxWidth: '300px' }}>
+                        <Typography variant='body2' noWrap>{val.title}</Typography>
+                        <Typography variant='body2' noWrap color='#a0a0a0'>{val.description.length === 0 ? "暂无简介" : val.description}</Typography>
                         <Box sx={{ display: 'flex', flex: '0 0 auto' }}>
                           <Button variant='outlined' size='small' sx={{ boxShadow: 'unset' }} onClick={() => setSelectedEditingPost(val)} >编辑</Button>
                           <Button variant='outlined' size='small' sx={{ marginLeft: "8px", boxShadow: 'unset' }} onClick={() => setSelectedDeletingPost(val)}>删除</Button>
-
-
                         </Box>
                       </Box>
                     </TableCell>
