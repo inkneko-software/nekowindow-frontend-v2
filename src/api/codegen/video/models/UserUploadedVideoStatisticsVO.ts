@@ -61,6 +61,18 @@ export interface UserUploadedVideoStatisticsVO {
      * @type {number}
      * @memberof UserUploadedVideoStatisticsVO
      */
+    likes: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserUploadedVideoStatisticsVO
+     */
+    coin: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserUploadedVideoStatisticsVO
+     */
     shared: number;
     /**
      * 
@@ -122,6 +134,8 @@ export function instanceOfUserUploadedVideoStatisticsVO(value: object): boolean 
     isInstance = isInstance && "coverUrl" in value;
     isInstance = isInstance && "duration" in value;
     isInstance = isInstance && "visit" in value;
+    isInstance = isInstance && "likes" in value;
+    isInstance = isInstance && "coin" in value;
     isInstance = isInstance && "shared" in value;
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "tags" in value;
@@ -150,6 +164,8 @@ export function UserUploadedVideoStatisticsVOFromJSONTyped(json: any, ignoreDisc
         'coverUrl': json['coverUrl'],
         'duration': json['duration'],
         'visit': json['visit'],
+        'likes': json['likes'],
+        'coin': json['coin'],
         'shared': json['shared'],
         'description': json['description'],
         'tags': json['tags'],
@@ -176,6 +192,8 @@ export function UserUploadedVideoStatisticsVOToJSON(value?: UserUploadedVideoSta
         'coverUrl': value.coverUrl,
         'duration': value.duration,
         'visit': value.visit,
+        'likes': value.likes,
+        'coin': value.coin,
         'shared': value.shared,
         'description': value.description,
         'tags': value.tags,

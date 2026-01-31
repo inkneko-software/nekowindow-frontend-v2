@@ -58,6 +58,24 @@ export interface VideoPostBriefVO {
     visit: number;
     /**
      * 
+     * @type {number}
+     * @memberof VideoPostBriefVO
+     */
+    shared: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostBriefVO
+     */
+    likes: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostBriefVO
+     */
+    coin: number;
+    /**
+     * 
      * @type {UploadUserVO}
      * @memberof VideoPostBriefVO
      */
@@ -104,6 +122,9 @@ export function instanceOfVideoPostBriefVO(value: object): boolean {
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "coverUrl" in value;
     isInstance = isInstance && "visit" in value;
+    isInstance = isInstance && "shared" in value;
+    isInstance = isInstance && "likes" in value;
+    isInstance = isInstance && "coin" in value;
     isInstance = isInstance && "uploader" in value;
     isInstance = isInstance && "tags" in value;
     isInstance = isInstance && "duration" in value;
@@ -129,6 +150,9 @@ export function VideoPostBriefVOFromJSONTyped(json: any, ignoreDiscriminator: bo
         'description': json['description'],
         'coverUrl': json['coverUrl'],
         'visit': json['visit'],
+        'shared': json['shared'],
+        'likes': json['likes'],
+        'coin': json['coin'],
         'uploader': UploadUserVOFromJSON(json['uploader']),
         'tags': json['tags'],
         'duration': json['duration'],
@@ -152,6 +176,9 @@ export function VideoPostBriefVOToJSON(value?: VideoPostBriefVO | null): any {
         'description': value.description,
         'coverUrl': value.coverUrl,
         'visit': value.visit,
+        'shared': value.shared,
+        'likes': value.likes,
+        'coin': value.coin,
         'uploader': UploadUserVOToJSON(value.uploader),
         'tags': value.tags,
         'duration': value.duration,

@@ -67,6 +67,24 @@ export interface VideoPostDetailVO {
      * @type {number}
      * @memberof VideoPostDetailVO
      */
+    shared: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    likes: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    coin: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
     visit: number;
     /**
      * 
@@ -104,6 +122,18 @@ export interface VideoPostDetailVO {
      * @memberof VideoPostDetailVO
      */
     createdAt: Date;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof VideoPostDetailVO
+     */
+    isLiked: boolean;
+    /**
+     * 已投币数量
+     * @type {number}
+     * @memberof VideoPostDetailVO
+     */
+    postedCoins: number;
 }
 
 /**
@@ -116,6 +146,9 @@ export function instanceOfVideoPostDetailVO(value: object): boolean {
     isInstance = isInstance && "description" in value;
     isInstance = isInstance && "coverUrl" in value;
     isInstance = isInstance && "duration" in value;
+    isInstance = isInstance && "shared" in value;
+    isInstance = isInstance && "likes" in value;
+    isInstance = isInstance && "coin" in value;
     isInstance = isInstance && "visit" in value;
     isInstance = isInstance && "uploader" in value;
     isInstance = isInstance && "videos" in value;
@@ -123,6 +156,8 @@ export function instanceOfVideoPostDetailVO(value: object): boolean {
     isInstance = isInstance && "partitionName" in value;
     isInstance = isInstance && "partitionId" in value;
     isInstance = isInstance && "createdAt" in value;
+    isInstance = isInstance && "isLiked" in value;
+    isInstance = isInstance && "postedCoins" in value;
 
     return isInstance;
 }
@@ -142,6 +177,9 @@ export function VideoPostDetailVOFromJSONTyped(json: any, ignoreDiscriminator: b
         'description': json['description'],
         'coverUrl': json['coverUrl'],
         'duration': json['duration'],
+        'shared': json['shared'],
+        'likes': json['likes'],
+        'coin': json['coin'],
         'visit': json['visit'],
         'uploader': UploadUserVOFromJSON(json['uploader']),
         'videos': ((json['videos'] as Array<any>).map(VideoPostResourceVOFromJSON)),
@@ -149,6 +187,8 @@ export function VideoPostDetailVOFromJSONTyped(json: any, ignoreDiscriminator: b
         'partitionName': json['partitionName'],
         'partitionId': json['partitionId'],
         'createdAt': (new Date(json['createdAt'])),
+        'isLiked': json['isLiked'],
+        'postedCoins': json['postedCoins'],
     };
 }
 
@@ -166,6 +206,9 @@ export function VideoPostDetailVOToJSON(value?: VideoPostDetailVO | null): any {
         'description': value.description,
         'coverUrl': value.coverUrl,
         'duration': value.duration,
+        'shared': value.shared,
+        'likes': value.likes,
+        'coin': value.coin,
         'visit': value.visit,
         'uploader': UploadUserVOToJSON(value.uploader),
         'videos': ((value.videos as Array<any>).map(VideoPostResourceVOToJSON)),
@@ -173,6 +216,8 @@ export function VideoPostDetailVOToJSON(value?: VideoPostDetailVO | null): any {
         'partitionName': value.partitionName,
         'partitionId': value.partitionId,
         'createdAt': (value.createdAt.toISOString()),
+        'isLiked': value.isLiked,
+        'postedCoins': value.postedCoins,
     };
 }
 
