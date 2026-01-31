@@ -1,0 +1,14 @@
+
+import { createSvgIcon, SvgIcon } from "@mui/material";
+
+
+const CoinIconFilled = (props) => {
+    return (
+        <SvgIcon {...props} viewBox="0 0 1024 1024">
+            <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64z m188.7 459.3L523.3 700.7c-6.2 6.2-16.4 6.2-22.6 0L323.3 523.3c-6.2-6.2-6.2-16.4 0-22.6l177.4-177.4c6.2-6.2 16.4-6.2 22.6 0l177.4 177.4c6.2 6.2 6.2 16.4 0 22.6z" p-id="10414"></path>
+
+        </SvgIcon>
+    )
+}
+
+export default CoinIconFilled;
