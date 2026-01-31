@@ -62,7 +62,7 @@ const PostsLayout = ({ children }: { children: React.ReactNode }) => {
                 <NekoWindowAppBar />
                 <Toolbar sx={{ visibility: 'hidden' }} />
                 <Box sx={{ flex: '1 0 auto', display: 'flex' }}>
-                    <List sx={{ width: '256px', borderRight: '1px #e3e3e3 solid' }}>
+                    <List sx={{ width: '256px', borderRight: '1px #e3e3e3 solid', flexShrink: 0 }}>
 
                         {/* <ListItemButton>我的数据</ListItemButton>
                     <ListItemButton>视频上传</ListItemButton>
@@ -77,7 +77,7 @@ const PostsLayout = ({ children }: { children: React.ReactNode }) => {
                             }
                         </List>
                     </List>
-                    <Box sx={{ flex: '1 0 auto' }}>
+                    <Box sx={{ flex: '1 1 auto' }}>
                         <Suspense fallback={null}>
                             {children}
                         </Suspense>
