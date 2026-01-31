@@ -12,6 +12,8 @@ import DanmakuPanel from '@components/Danmaku/DanmakuPanel';
 import RecommendPanel from '@components/Recommend/RecommendPanel';
 import CoinIcon from '@components/Icons/CoinIcon';
 import CoinIconFilled from '@components/Icons/CoinIconFilled';
+import BCoinIcon from '@components/Icons/BCoinIcon';
+
 import FormatColorTextRoundedIcon from '@mui/icons-material/FormatColorTextRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
@@ -193,8 +195,8 @@ export default function VideoPage({ }) {
           {/* video info, like, coin, collections... */}
           <Box sx={{ width: '100%', marginTop: '10px', marginBottom: "10px" }}>
             <Stack direction="row"  >
-              <IconButton sx={{ borderRadius: 7 }} ><ThumbUpRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>1</Typography> </IconButton>
-              <IconButton sx={{ borderRadius: 7 }} ><CoinIconFilled color="video_rating_control" /><Typography variant="body2" sx={{ marginLeft: '5px' }}>2</Typography> </IconButton>
+              <IconButton sx={{ borderRadius: 7 }} ><ThumbUpRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.likes}</Typography> </IconButton>
+              <IconButton sx={[{ borderRadius: 7} , post.postedCoins !== 0 && {color:  '#0aa8cf' }]}  ><BCoinIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.coin}</Typography> </IconButton>
               <IconButton sx={{ borderRadius: 7 }} ><StarRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
               <IconButton sx={{ borderRadius: 7 }} ><ReplyRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
             </Stack>
