@@ -16,16 +16,25 @@
 import * as runtime from '../runtime';
 import type {
   EmailLoginDTO,
+  EmailPasswordLoginDTO,
+  PostVideoCoinDTO,
   ResponseMyUserDetailVO,
   ResponseObject,
   ResponseString,
   ResponseUserDetailVO,
   SendLoginEmailCodeDTO,
+  SendResetPasswordEmailCodeDTO,
+  UpdatePasswordByEmailCodeDTO,
+  UpdatePasswordByOldPasswordDTO,
   UpdateUserDetailDTO,
 } from '../models/index';
 import {
     EmailLoginDTOFromJSON,
     EmailLoginDTOToJSON,
+    EmailPasswordLoginDTOFromJSON,
+    EmailPasswordLoginDTOToJSON,
+    PostVideoCoinDTOFromJSON,
+    PostVideoCoinDTOToJSON,
     ResponseMyUserDetailVOFromJSON,
     ResponseMyUserDetailVOToJSON,
     ResponseObjectFromJSON,
@@ -36,6 +45,12 @@ import {
     ResponseUserDetailVOToJSON,
     SendLoginEmailCodeDTOFromJSON,
     SendLoginEmailCodeDTOToJSON,
+    SendResetPasswordEmailCodeDTOFromJSON,
+    SendResetPasswordEmailCodeDTOToJSON,
+    UpdatePasswordByEmailCodeDTOFromJSON,
+    UpdatePasswordByEmailCodeDTOToJSON,
+    UpdatePasswordByOldPasswordDTOFromJSON,
+    UpdatePasswordByOldPasswordDTOToJSON,
     UpdateUserDetailDTOFromJSON,
     UpdateUserDetailDTOToJSON,
 } from '../models/index';
@@ -48,8 +63,28 @@ export interface LoginRequest {
     emailLoginDTO: EmailLoginDTO;
 }
 
+export interface LoginByEmailPasswordRequest {
+    emailPasswordLoginDTO: EmailPasswordLoginDTO;
+}
+
+export interface PostVideoCoinRequest {
+    postVideoCoinDTO: PostVideoCoinDTO;
+}
+
 export interface SendLoginEmailCodeRequest {
     sendLoginEmailCodeDTO: SendLoginEmailCodeDTO;
+}
+
+export interface SendPasswordResetEmailCodeRequest {
+    sendResetPasswordEmailCodeDTO: SendResetPasswordEmailCodeDTO;
+}
+
+export interface UpdatePasswordByEmailCodeRequest {
+    updatePasswordByEmailCodeDTO: UpdatePasswordByEmailCodeDTO;
+}
+
+export interface UpdatePasswordByOldPasswordRequest {
+    updatePasswordByOldPasswordDTO: UpdatePasswordByOldPasswordDTO;
 }
 
 export interface UpdateUserDetailRequest {
@@ -157,6 +192,41 @@ export class UserControllerApi extends runtime.BaseAPI {
     }
 
     /**
+     * 通过邮箱与密码进行登录
+     * 登录
+     */
+    async loginByEmailPasswordRaw(requestParameters: LoginByEmailPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.emailPasswordLoginDTO === null || requestParameters.emailPasswordLoginDTO === undefined) {
+            throw new runtime.RequiredError('emailPasswordLoginDTO','Required parameter requestParameters.emailPasswordLoginDTO was null or undefined when calling loginByEmailPassword.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/user/loginByEmailPassword`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: EmailPasswordLoginDTOToJSON(requestParameters.emailPasswordLoginDTO),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 通过邮箱与密码进行登录
+     * 登录
+     */
+    async loginByEmailPassword(requestParameters: LoginByEmailPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.loginByEmailPasswordRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
      * 查询当前用户的个人资料
      */
     async myUserDetailRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseMyUserDetailVO>> {
@@ -179,6 +249,39 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async myUserDetail(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseMyUserDetailVO> {
         const response = await this.myUserDetailRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 视频投币
+     */
+    async postVideoCoinRaw(requestParameters: PostVideoCoinRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.postVideoCoinDTO === null || requestParameters.postVideoCoinDTO === undefined) {
+            throw new runtime.RequiredError('postVideoCoinDTO','Required parameter requestParameters.postVideoCoinDTO was null or undefined when calling postVideoCoin.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/user/postVideoCoin`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: PostVideoCoinDTOToJSON(requestParameters.postVideoCoinDTO),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 视频投币
+     */
+    async postVideoCoin(requestParameters: PostVideoCoinRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.postVideoCoinRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -214,6 +317,109 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async sendLoginEmailCode(requestParameters: SendLoginEmailCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
         const response = await this.sendLoginEmailCodeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 发送密码重置邮件
+     */
+    async sendPasswordResetEmailCodeRaw(requestParameters: SendPasswordResetEmailCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.sendResetPasswordEmailCodeDTO === null || requestParameters.sendResetPasswordEmailCodeDTO === undefined) {
+            throw new runtime.RequiredError('sendResetPasswordEmailCodeDTO','Required parameter requestParameters.sendResetPasswordEmailCodeDTO was null or undefined when calling sendPasswordResetEmailCode.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/user/sendPasswordResetEmailCode`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: SendResetPasswordEmailCodeDTOToJSON(requestParameters.sendResetPasswordEmailCodeDTO),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 发送密码重置邮件
+     */
+    async sendPasswordResetEmailCode(requestParameters: SendPasswordResetEmailCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.sendPasswordResetEmailCodeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 通过邮箱与邮箱验证码进行密码更新
+     * 更新密码
+     */
+    async updatePasswordByEmailCodeRaw(requestParameters: UpdatePasswordByEmailCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.updatePasswordByEmailCodeDTO === null || requestParameters.updatePasswordByEmailCodeDTO === undefined) {
+            throw new runtime.RequiredError('updatePasswordByEmailCodeDTO','Required parameter requestParameters.updatePasswordByEmailCodeDTO was null or undefined when calling updatePasswordByEmailCode.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/user/updatePasswordByEmailCode`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdatePasswordByEmailCodeDTOToJSON(requestParameters.updatePasswordByEmailCodeDTO),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 通过邮箱与邮箱验证码进行密码更新
+     * 更新密码
+     */
+    async updatePasswordByEmailCode(requestParameters: UpdatePasswordByEmailCodeRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.updatePasswordByEmailCodeRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * 通过旧密码进行密码更新
+     * 更新密码
+     */
+    async updatePasswordByOldPasswordRaw(requestParameters: UpdatePasswordByOldPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ResponseObject>> {
+        if (requestParameters.updatePasswordByOldPasswordDTO === null || requestParameters.updatePasswordByOldPasswordDTO === undefined) {
+            throw new runtime.RequiredError('updatePasswordByOldPasswordDTO','Required parameter requestParameters.updatePasswordByOldPasswordDTO was null or undefined when calling updatePasswordByOldPassword.');
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
+
+        const response = await this.request({
+            path: `/api/v1/user/updatePasswordByOldPassword`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+            body: UpdatePasswordByOldPasswordDTOToJSON(requestParameters.updatePasswordByOldPasswordDTO),
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ResponseObjectFromJSON(jsonValue));
+    }
+
+    /**
+     * 通过旧密码进行密码更新
+     * 更新密码
+     */
+    async updatePasswordByOldPassword(requestParameters: UpdatePasswordByOldPasswordRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ResponseObject> {
+        const response = await this.updatePasswordByOldPasswordRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -2,12 +2,17 @@ apis/UserControllerApi.ts
 apis/index.ts
 index.ts
 models/EmailLoginDTO.ts
+models/EmailPasswordLoginDTO.ts
 models/MyUserDetailVO.ts
+models/PostVideoCoinDTO.ts
 models/ResponseMyUserDetailVO.ts
 models/ResponseObject.ts
 models/ResponseString.ts
 models/ResponseUserDetailVO.ts
 models/SendLoginEmailCodeDTO.ts
+models/SendResetPasswordEmailCodeDTO.ts
+models/UpdatePasswordByEmailCodeDTO.ts
+models/UpdatePasswordByOldPasswordDTO.ts
 models/UpdateUserDetailDTO.ts
 models/UserDetailVO.ts
 models/index.ts
