@@ -1,6 +1,6 @@
 'use client'
 import * as React from 'react';
-import { Avatar, Box, Chip, Container, Divider, IconButton, Paper, Stack, styled, Toolbar, Typography, useTheme, Slider, Popper, Fade, SvgIcon, Button, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, ListItemButton, RadioGroup, Radio, FormControlLabel, InputBase, Switch, TextField } from "@mui/material";
+import { Avatar, Box, Chip, Container, Divider, IconButton, Paper, Stack, styled, Toolbar, Typography, useTheme, Slider, Popper, Fade, SvgIcon, Button, Accordion, AccordionSummary, AccordionDetails, List, ListItem, ListItemText, ListItemButton, RadioGroup, Radio, FormControlLabel, InputBase, Switch, TextField, Tooltip } from "@mui/material";
 import NekoWindowAppBar from "@components/AppBar/NekoWindowAppBar";
 import ThumbUpRoundedIcon from '@mui/icons-material/ThumbUpRounded';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
@@ -22,11 +22,15 @@ import DefaultErrorPage from 'next/error'
 import { useRouter } from 'next/navigation';
 import { Configuration as VideoAPIConfiguration, UploadUserVO, VideoControllerApi, VideoPostDetailVO } from '@api/codegen/video';
 import { Configuration as DanmakuAPIConfiguration, DanmakuControllerApi } from '@api/codegen/danmaku';
+import { Configuration as UserAPIConfiguration, UserControllerApi } from '@api/codegen/user';
+
 
 import { useVideoPostDetailContext } from './context';
 import dynamic from 'next/dynamic';
 import { DanmakuBullet } from '@components/Danmaku/Danmaku';
 import Link from 'next/link';
+import PostVideoCoinDialog from '@components/Dialog/PostVideoCoinDialog';
+import useToast from '@components/Common/Toast';
 
 const NepPlayer = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
 const CustomDanmakuEvent = dynamic(() => import('@components/NepPlayer/NepPlayer'), { ssr: false });
@@ -57,12 +61,13 @@ videoAdaptionsMap.set("30", "360P 流畅");
 export default function VideoPage({ }) {
   const videoapi = new VideoControllerApi(new VideoAPIConfiguration({ credentials: 'include', basePath: process.env.NEXT_PUBLIC_API_SERVER }));
   const danmakuAPI = new DanmakuControllerApi(new DanmakuAPIConfiguration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
-
+  const userAPI = new UserControllerApi(new UserAPIConfiguration({ credentials: "include", basePath: process.env.NEXT_PUBLIC_API_SERVER }))
 
   const theme = useTheme();
   const router = useRouter();
 
   const videoPostDetailContext = useVideoPostDetailContext();
+  const [Toast, makeToast] = useToast();
 
   if (!videoPostDetailContext) {
     throw new Error("videoPostDetailContext is null");
@@ -94,6 +99,8 @@ export default function VideoPage({ }) {
   })
 
   const [danmakus, setDanmakus] = React.useState<DanmakuBullet[]>([])
+  const [postVideoCoinDialogOpen, setPostVideoCoinDialogOpen] = React.useState(false);
+
   React.useEffect(() => {
     danmakuAPI.getChatRoomByVideoResourceId({ videoResourceId: videoPostDetailContext.videoPostDetail.videos[0].videoId }).then(res => {
       if (res.code !== 0 || res.data === null || res.data === undefined) {
@@ -119,7 +126,7 @@ export default function VideoPage({ }) {
       })
     })
 
-    videoapi.logMetrics({videoId: post.videos[0].videoId});
+    videoapi.logMetrics({ videoId: post.videos[0].videoId });
   }, [videoPostDetailContext.nkid])
 
   const handleSendDanmaku = () => {
@@ -144,9 +151,27 @@ export default function VideoPage({ }) {
     }
   }
 
+  const handleCoinButtonClick = () => {
+    setPostVideoCoinDialogOpen(true);
+  }
+  const handlePostVideoCoinConfirm = (coinNum: number, isLikeVideoChecked: boolean) => {
+    userAPI.postVideoCoin({ postVideoCoinDTO: { nkid: post.nkid, coinNum } })
+      .then(res => {
+        if (res.code === 0) {
+          videoPostDetailContext.handleUpdateVideoPostCoin(coinNum);
+          makeToast("投币成功")
+          setPostVideoCoinDialogOpen(false);
+        } else {
+          makeToast(res.message, 'error')
+        }
+      })
+  }
+
   return (
     <Box sx={{ minWidth: "1360px", minHeight: "768px" }}>
+      <PostVideoCoinDialog open={postVideoCoinDialogOpen} onClose={() => setPostVideoCoinDialogOpen(false)} onConfirm={handlePostVideoCoinConfirm} isLastCoin={post.postedCoins === 1} />
       <NekoWindowAppBar />
+      {Toast}
       <Toolbar />
       <Container
         maxWidth="xl"
@@ -183,22 +208,31 @@ export default function VideoPage({ }) {
             <NepPlayer title={video.title} src={video.dashMpdUrl} adaptions={videoAdaptions} danmakus={danmakus} />
           </Box>
           {/* 弹幕控制面板 */}
-          <Paper sx={{ display: "flex", padding: "8px 8px", borderRadius: "0", height: "40px"  }} elevation={2}>
+          <Paper sx={{ display: "flex", padding: "8px 8px", borderRadius: "0", height: "40px" }} elevation={2}>
             <Typography sx={{ margin: 'auto 0' }} variant="body2">1人正在看,已装填500条弹幕</Typography>
             <FormControlLabel control={<Switch defaultChecked />} label="弹幕" sx={{ marginLeft: 10, fontSize: "2px" }} />
             <Paper sx={{ flexGrow: 1, display: "flex", margin: "5px", bgcolor: "#eeeeee" }} elevation={0}>
               <IconButton><FormatColorTextRoundedIcon /></IconButton>
-              <InputBase id='danmaku-input' sx={{ flexGrow: 1, fontSize: '12px' }} placeholder="装填弹幕~"   onKeyUp={handleDanmakuInputKeyUp} ></InputBase>
+              <InputBase id='danmaku-input' sx={{ flexGrow: 1, fontSize: '12px' }} placeholder="装填弹幕~" onKeyUp={handleDanmakuInputKeyUp} ></InputBase>
               <Button variant="contained" startIcon={<SendRoundedIcon />} onClick={handleSendDanmaku} disableElevation>发送</Button>
             </Paper>
           </Paper>
           {/* video info, like, coin, collections... */}
           <Box sx={{ width: '100%', marginTop: '10px', marginBottom: "10px" }}>
             <Stack direction="row"  >
-              <IconButton sx={{ borderRadius: 7 }} ><ThumbUpRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.likes}</Typography> </IconButton>
-              <IconButton sx={[{ borderRadius: 7} , post.postedCoins !== 0 && {color:  '#0aa8cf' }]}  ><BCoinIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.coin}</Typography> </IconButton>
-              <IconButton sx={{ borderRadius: 7 }} ><StarRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
-              <IconButton sx={{ borderRadius: 7 }} ><ReplyRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
+              <Tooltip title={post.isLiked ? '取消点赞' : '点赞'} placement='top'>
+                <IconButton sx={{ borderRadius: 7 }} ><ThumbUpRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.likes}</Typography> </IconButton>
+              </Tooltip>
+              <Tooltip title={post.postedCoins === 2 ? '已达投币上限' : '投币'} placement='top'>
+                <IconButton sx={[{ borderRadius: 7 }, post.postedCoins !== 0 && { color: '#0aa8cf' }]} onClick={post.postedCoins === 2 ? () => { } : handleCoinButtonClick} ><BCoinIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>{post.coin}</Typography> </IconButton>
+              </Tooltip>
+              <Tooltip title='收藏' placement='top'>
+                <IconButton sx={{ borderRadius: 7 }} ><StarRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
+              </Tooltip>
+              <Tooltip title='转发' placement='top'>
+                <IconButton sx={{ borderRadius: 7 }} ><ReplyRoundedIcon /><Typography variant="body2" sx={{ marginLeft: '5px' }}>0</Typography> </IconButton>
+              </Tooltip>
+
             </Stack>
           </Box>
           <Divider sx={{ marginBottom: "10px" }} />
@@ -217,7 +251,7 @@ export default function VideoPage({ }) {
           {/* comment area */}
           <Box sx={{ display: 'flex' }}>
             <SocialSection>
-              <CommentPanel objectId={nkid} idType='VIDEO'/>
+              <CommentPanel objectId={nkid} idType='VIDEO' />
             </SocialSection>
             {/* <RecommentPannel/> */}
           </Box>

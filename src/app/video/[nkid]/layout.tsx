@@ -34,7 +34,7 @@ export default async function VideoLayout({ children, params }: { children: Reac
     const videoPostDetailVO = resp.data;
 
     return (
-        <VideoPostDetailProvider value={{ nkid: params.nkid, currentPart: 0, videoPostDetail: videoPostDetailVO }}>
+        <VideoPostDetailProvider value={{ nkid: params.nkid, currentPart: 0, videoPostDetail: videoPostDetailVO}}>
             {children}
         </VideoPostDetailProvider>
 
